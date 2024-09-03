@@ -51,6 +51,7 @@ function App() {
 
       {
         {
+          "start": <Start />,
           "login": <Login handleLogin={handleLogin} />,
           "register": <Register handleRegistration={handleRegistration} />,
           "about": <About />,

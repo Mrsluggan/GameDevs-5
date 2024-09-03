@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface LoginFormProps {
-  handleLogin: (user: any) => void;
+  handleLogin: (token: string) => void;
 }
 
 function Login({ handleLogin }: LoginFormProps) {
@@ -15,7 +15,7 @@ function Login({ handleLogin }: LoginFormProps) {
     e.preventDefault();
 
     try {
-      const response = await fetch('login endpoint här', {
+      const response = await fetch('http://localhost:8080/login-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,8 +28,9 @@ function Login({ handleLogin }: LoginFormProps) {
         return;
       }
 
-      const user = await response.json();
-      handleLogin(user);
+      const token = await response.text();  
+      handleLogin(token);
+      alert("Du är inloggad som");  
     } catch (error) {
       console.error('Error vid inloggning:', error);
       alert('Ett fel inträffade vid inloggning');

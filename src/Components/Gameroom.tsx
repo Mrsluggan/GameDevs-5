@@ -3,8 +3,7 @@ import Chat from "./Chat";
 
 function Gameroom() {
     return (
-        <>
-          
+        <> 
           <div>
             <h2>Guess what this is?</h2>
           </div>

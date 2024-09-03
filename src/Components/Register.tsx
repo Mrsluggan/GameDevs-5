@@ -25,25 +25,26 @@ function Register({ handleRegistration }: RegisterProps) {
     }
 
     try {
-      const response = await fetch('registrera endpoint här', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      const message = await response.text();
-
-      alert(message);
-      
-      if (response.ok && message.includes("Registrering lyckades")) {
-        handleRegistration();
+        const response = await fetch('http://localhost:8080/register-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+        
+        if (response.ok) {
+          alert("Registrering lyckades"); 
+          handleRegistration();
+        } else {
+          const message = await response.text();
+          alert(message); 
+        }
+      } catch (error) {
+        console.error('Error vid registrering:', error);
+        alert("Ett fel inträffade vid registreringen");
       }
-    } catch (error) {
-      console.error('Error vid registrering:', error);
-      alert("Ett fel inträffade vid registreringen");
-    }
-  };
+    };
 
   return (
     <div>
