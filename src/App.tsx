@@ -7,6 +7,7 @@ import About from "./Components/About";
 import Start from "./Components/Start";
 import Register from "./Components/Register";
 import Login from "./Components/Login";
+import Leaderboard from "./Components/Leaderboard";
 
 function App() {
   const [page, setPage] = useState<string>("");
@@ -54,6 +55,11 @@ function App() {
         about: <About />,
         gameroom: isLoggedIn ? (
           <Gameroom />
+        ) : (
+          <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+        ),
+        leaderboard: isLoggedIn ? (
+          <Leaderboard />
         ) : (
           <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
         ),
