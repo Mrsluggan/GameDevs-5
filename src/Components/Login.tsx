@@ -1,58 +1,92 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 
-interface LoginFormProps {
-  handleLogin: (token: string) => void;
+interface Props {
+  setPage: (page: string) => void;
+  setIsLoggedIn: (loggedIn: boolean) => void;
 }
 
-function Login({ handleLogin }: LoginFormProps) {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+interface user {
+  username: string;
+  password: string;
+}
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value);
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
+function Login({ setPage, setIsLoggedIn }: Props) {
+  const [newLogin, setNewLogin] = useState<user>({
+    username: "",
+    password: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const loginUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch('http://localhost:8080/login-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+    fetch("http://localhost:8080/login-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...newLogin }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Fel användarnamn eller lösenord, prova igen!");
+        }
+        return response.text();
+      })
+      .then((token) => {
+        console.log("Mottagen JWT-token:", token);
+
+        localStorage.setItem("username", newLogin.username);
+        localStorage.setItem("token", token);
+
+        setPage("start");
+        setIsLoggedIn(true);
+      })
+      .catch((error) => {
+        console.error("Error logging in:", error);
+        setErrorMessage(error.message);
       });
-
-      if (!response.ok) {
-        alert('Fel användarnamn eller lösenord');
-        return;
-      }
-
-      const token = await response.text();  
-      handleLogin(token);
-      alert("Du är inloggad som");  
-    } catch (error) {
-      console.error('Error vid inloggning:', error);
-      alert('Ett fel inträffade vid inloggning');
-    }
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          placeholder="Användarnamn"
-          value={username}
-          onChange={handleUsernameChange}
-        />
-        <input
-          type="password"
-          placeholder="Lösenord"
-          value={password}
-          onChange={handlePasswordChange}
-        />
-        <button type="submit">Logga in</button>
+      <form onSubmit={loginUser}>
+        <h3>Logga in</h3>
+        <label>
+          Användarnamn
+          <br />
+          <input
+            placeholder="Användarnamn"
+            type="text"
+            required
+            value={newLogin.username}
+            onChange={(e) =>
+              setNewLogin({ ...newLogin, username: e.target.value })
+            }
+          ></input>
+        </label>
+        <br />
+        <br />
+        <label>
+          Lösenord
+          <br />
+          <input
+            placeholder="Lösenord"
+            type="password"
+            required
+            value={newLogin.password}
+            onChange={(e) =>
+              setNewLogin({ ...newLogin, password: e.target.value })
+            }
+          ></input>
+        </label>
+        <br />
+        <br />
+        {errorMessage && <p style={{ fontSize: "20px" }}>{errorMessage}</p>}
+        <button className="button" type="submit">
+          Logga in
+        </button>
       </form>
     </div>
   );
