@@ -38,10 +38,6 @@ function App() {
     window.history.pushState(null, "", "?page=" + pageUrl);
   }, [page]);
 
-  const handleRegistration = () => {
-    setPage("start");
-  };
-
   return (
     <>
       <h1>Drawing Game</h1>
@@ -54,9 +50,7 @@ function App() {
       {{
         start: <Start />,
         login: <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />,
-        register: (
-          <Register handleRegistration={handleRegistration} setPage={setPage} />
-        ),
+        register: <Register setPage={setPage} />,
         about: <About />,
         gameroom: isLoggedIn ? (
           <Gameroom />
