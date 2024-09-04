@@ -1,9 +1,9 @@
 function About() {
-    return (
-        <div>
-            <h3>About</h3>
-        </div>
-    );
+  return (
+    <div>
+      <h3>Om spelet</h3>
+    </div>
+  );
 }
 
 export default About;
