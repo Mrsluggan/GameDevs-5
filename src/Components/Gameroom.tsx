@@ -11,20 +11,9 @@ function Gameroom() {
   const stompClient = useStompClient();
   const [gamerooms, setGamerooms] = useState<any[]>([]);
   const [isJoined, setIsJoined] = useState(false);
+  const [gameRoomID, setGameRoomID] = useState<string>("");
 
-  useSubscription("/topic/test", (message) => console.log(message.body));
 
-  const sendMessage = () => {
-    if (stompClient) {
-      //Send Message
-      stompClient.publish({
-        destination: "/app/echo",
-        body: "Echo 123",
-      });
-    } else {
-      //Handle error
-    }
-  };
 
 
 
@@ -47,7 +36,8 @@ function Gameroom() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        gameRoomName: gameroomName
+        gameRoomName: gameroomName,
+        roomOwner: localStorage.getItem("username")
       }),
     })
       .then(res => res.json())
@@ -58,10 +48,12 @@ function Gameroom() {
   }
 
 
-  const joinGame = () => {
+  const joinGame = (gameRoomID:string) => {
     console.log(">:D");
     setIsJoined(true);
-
+    setGameRoomID(gameRoomID)
+    console.log(gameRoomID);
+    
 
 
   }
@@ -90,7 +82,7 @@ function Gameroom() {
                       current players: {gameroom.listOfPlayers.length}
 
                     </div>
-                    <button onClick={joinGame}>Join game</button>
+                    <button onClick={() => joinGame(gameroom.id)}>Join game</button>
                   </div>
                   <hr />
 
@@ -104,8 +96,7 @@ function Gameroom() {
         /* här är canvas */
         <div>
 
-          SPELET SKA VARA HÄR
-          <button onClick={sendMessage}>Send Message</button>
+          <Chat gameRoomID={gameRoomID} />
 
         </div>}
 
