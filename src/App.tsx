@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { StompSessionProvider, useSubscription } from "react-stomp-hooks";
 
 import Gameroom from "./Components/Gameroom";
 import Menu from "./Components/Menu";
@@ -41,29 +42,31 @@ function App() {
 
   return (
     <>
-      <h1>Drawing Game</h1>
-      <Menu
-        setPage={setPage}
-        setIsLoggedIn={setIsLoggedIn}
-        isLoggedIn={isLoggedIn}
-      />
+      <StompSessionProvider url="http://localhost:8080/ws-endpoint">
+        <h1>Drawing Game</h1>
+        <Menu
+          setPage={setPage}
+          setIsLoggedIn={setIsLoggedIn}
+          isLoggedIn={isLoggedIn}
+        />
 
-      {{
-        start: <Start />,
-        login: <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />,
-        register: <Register setPage={setPage} />,
-        about: <About />,
-        gameroom: isLoggedIn ? (
-          <Gameroom />
-        ) : (
-          <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
-        ),
-        leaderboard: isLoggedIn ? (
-          <Leaderboard />
-        ) : (
-          <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
-        ),
-      }[page] || <Start />}
+        {{
+          start: <Start />,
+          login: <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />,
+          register: <Register setPage={setPage} />,
+          about: <About />,
+          gameroom: isLoggedIn ? (
+            <Gameroom />
+          ) : (
+            <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+          ),
+          leaderboard: isLoggedIn ? (
+            <Leaderboard />
+          ) : (
+            <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+          ),
+        }[page] || <Start />}
+      </StompSessionProvider>
     </>
   );
 }
