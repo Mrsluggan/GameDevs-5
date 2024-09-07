@@ -13,6 +13,9 @@ function Gameroom() {
   const [isJoined, setIsJoined] = useState(false);
   const [gameRoomID, setGameRoomID] = useState<string>("");
 
+  useSubscription("/topic/updateUI/", (message: any) => {
+
+  });
 
 
 
@@ -25,6 +28,23 @@ function Gameroom() {
         console.log(data);
       })
   }
+  const checkPlayers = () => {
+    fetch("http://localhost:8080/api/gameroom/checkplayer/" + localStorage.getItem("username"))
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Player not found");
+        }
+      })
+      .then(data => {
+        setGameRoomID(data.id);
+        setIsJoined(true);
+        joinGame(data.id);
+      })
+
+  }
+
 
   const createGame = () => {
     console.log("hej!");
@@ -42,24 +62,56 @@ function Gameroom() {
     })
       .then(res => res.json())
       .then(data => {
+
         console.log(data);
         loadGameRooms();
       })
   }
 
 
-  const joinGame = (gameRoomID:string) => {
-    console.log(">:D");
+  const joinGame = (gameRoomID: string) => {
     setIsJoined(true);
     setGameRoomID(gameRoomID)
-    console.log(gameRoomID);
-    
+
+    fetch("http://localhost:8080/api/gameroom/join/" + gameRoomID, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: localStorage.getItem("username")
+      }),
+      
+
+
+    })
 
 
   }
 
+  const leaveGameRoom = () => {
+    console.log(gameRoomID);
+
+    fetch("http://localhost:8080/api/gameroom/leave/" + gameRoomID, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: localStorage.getItem("username")
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+
+      })
+    setIsJoined(false);
+    loadGameRooms();
+  }
+
   useEffect(() => {
     loadGameRooms();
+    checkPlayers();
   }, [])
 
   return (
@@ -82,7 +134,10 @@ function Gameroom() {
                       current players: {gameroom.listOfPlayers.length}
 
                     </div>
+                    <div>
                     <button onClick={() => joinGame(gameroom.id)}>Join game</button>
+
+                    </div>
                   </div>
                   <hr />
 
@@ -94,10 +149,11 @@ function Gameroom() {
         </div>
         :
         /* här är canvas */
-        <div>
-
+        <div style={{ padding: "2%" }}>
+          <div style={{ textAlign: "left" }}>
+            <button onClick={leaveGameRoom}>Lämna spelrum</button>
+          </div>
           <Chat gameRoomID={gameRoomID} />
-
         </div>}
 
     </>
