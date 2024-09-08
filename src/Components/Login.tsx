@@ -21,7 +21,7 @@ function Login({ setPage, setIsLoggedIn }: Props) {
   const loginUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch("https://monkfish-app-xpltr.ondigitalocean.app/login-user", {
+    fetch("http://localhost:8080/login-user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
