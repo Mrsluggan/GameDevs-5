@@ -81,7 +81,7 @@ function Gameroom() {
       body: JSON.stringify({
         username: localStorage.getItem("username")
       }),
-      
+
 
 
     })
@@ -101,10 +101,7 @@ function Gameroom() {
         username: localStorage.getItem("username")
       }),
     })
-      .then(res => res.json())
-      .then(data => {
 
-      })
     setIsJoined(false);
     loadGameRooms();
   }
@@ -135,7 +132,7 @@ function Gameroom() {
 
                     </div>
                     <div>
-                    <button onClick={() => joinGame(gameroom.id)}>Join game</button>
+                      <button onClick={() => joinGame(gameroom.id)}>Join game</button>
 
                     </div>
                   </div>

@@ -28,36 +28,7 @@ export default function Chat({ gameRoomID }: Props) {
     setListOfMessages((prevMessages: string[]) => [...prevMessages, parsed]);
   });
 
-  const joinGameRoom = () => {
-    fetch("http://localhost:8080/api/gameroom/join" + gameRoomID, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: localStorage.getItem("username")
-      }),
-    })
-      .then(res => res.json())
-      .then(data => {
 
-      })
-  }
-  const leaveGameRoom = () => {
-    fetch("http://localhost:8080/api/gameroom/leave" + gameRoomID, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        roomOwner: localStorage.getItem("username")
-      }),
-    })
-      .then(res => res.json())
-      .then(data => {
-
-      })
-  }
 
   const sendWelcome = () => {
 
@@ -100,12 +71,15 @@ export default function Chat({ gameRoomID }: Props) {
     }
   }
 
-  const loadMessags = () => {
+  const loadMessags = (gameRoomID: string) => {
 
-    fetch("http://localhost:8080/api/gameroom/")
+    fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
       .then(res => res.json())
       .then(data => {
-
+        console.log(data.roomChat.listOfMessages);
+        data.roomChat.listOfMessages.forEach((message: any) => {
+          setListOfMessages((prevMessages: any[]) => [...prevMessages, message]);
+        })
       })
 
   }
@@ -114,6 +88,7 @@ export default function Chat({ gameRoomID }: Props) {
 
   useEffect(() => {
     sendWelcome()
+    loadMessags(gameRoomID)
   }, []);
 
 
