@@ -113,7 +113,7 @@ export default function Chat({ gameRoomID }: Props) {
             listStyleType: "none",
             border: "1px solid white",
             overflowY: "scroll",
-            height: "200px",
+            height: "450px",
             padding: "10px",
           }}
         >
