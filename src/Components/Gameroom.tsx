@@ -23,12 +23,12 @@ function Gameroom() {
   const loadGameRooms = () => {
 
 
-      fetch("http://localhost:8080/api/gameroom/")
-        .then(res => res.json())
-        .then(data => {
-          setGamerooms(data);
-        })
-    
+    fetch("http://localhost:8080/api/gameroom/")
+      .then(res => res.json())
+      .then(data => {
+        setGamerooms(data);
+      })
+
   }
   const checkPlayers = () => {
     fetch("http://localhost:8080/api/gameroom/checkplayer/" + localStorage.getItem("username"))
@@ -152,7 +152,13 @@ function Gameroom() {
           <div style={{ textAlign: "left" }}>
             <button onClick={leaveGameRoom}>Lämna spelrum</button>
           </div>
-          <Canvas gameRoomID={gameRoomID} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center",gap: "10px" }}>
+
+
+            <Canvas gameRoomID={gameRoomID} />
+            <Chat gameRoomID={gameRoomID} />
+          </div>
+
         </div>}
 
     </>
