@@ -8,7 +8,7 @@ interface Props {
 const Canvas = ({ gameRoomID }: Props) => {
     const canvasInput = useRef<HTMLCanvasElement>(null);
     const context = canvasInput.current?.getContext("2d");
-
+    const [holding, isHolding] = useState(false);
     const stompClient = useStompClient();
 
     useSubscription("/topic/updatecanvas/" + gameRoomID, (message: any) => {
@@ -16,25 +16,21 @@ const Canvas = ({ gameRoomID }: Props) => {
         console.log(message.body)
         let parsed = JSON.parse(message.body);
         console.log(parsed);
-        
+
         if (canvasInput?.current && context) {
-            drawImage(parsed.x,parsed.y)
+            drawImage(parsed.x, parsed.y)
         }
 
     });
 
-
-
-
-
-
-    const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
+    
+    const getMousePos = (canvas: HTMLCanvasElement, event: MouseEvent) => {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
         };
-    }
+    };
 
 
 
