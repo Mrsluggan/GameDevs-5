@@ -9,6 +9,7 @@ import Start from "./Components/Start";
 import Register from "./Components/Register";
 import Login from "./Components/Login";
 import Leaderboard from "./Components/Leaderboard";
+import AddWord from "./Components/AddWord";
 
 function App() {
   const [page, setPage] = useState<string>("");
@@ -62,6 +63,11 @@ function App() {
           ),
           leaderboard: isLoggedIn ? (
             <Leaderboard />
+          ) : (
+            <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+          ),
+          AddWord: isLoggedIn ? (
+            <AddWord />
           ) : (
             <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
           ),
