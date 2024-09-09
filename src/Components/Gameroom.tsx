@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Canvas from "./Canvas";
 import Chat from "./Chat";
 import { useStompClient, useSubscription } from "react-stomp-hooks";
+import Canvas from "./Canvas";
 interface gameroom {
   gameRoomName: any
 }
@@ -21,12 +21,14 @@ function Gameroom() {
 
 
   const loadGameRooms = () => {
-    fetch("http://localhost:8080/api/gameroom/")
-      .then(res => res.json())
-      .then(data => {
-        setGamerooms(data);
-        console.log(data);
-      })
+
+
+      fetch("http://localhost:8080/api/gameroom/")
+        .then(res => res.json())
+        .then(data => {
+          setGamerooms(data);
+        })
+    
   }
   const checkPlayers = () => {
     fetch("http://localhost:8080/api/gameroom/checkplayer/" + localStorage.getItem("username"))
@@ -150,7 +152,7 @@ function Gameroom() {
           <div style={{ textAlign: "left" }}>
             <button onClick={leaveGameRoom}>Lämna spelrum</button>
           </div>
-          <Chat gameRoomID={gameRoomID} />
+          <Canvas gameRoomID={gameRoomID} />
         </div>}
 
     </>
