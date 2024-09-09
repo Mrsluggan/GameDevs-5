@@ -5,7 +5,6 @@ interface Props {
 
 }
 export default function Chat({ gameRoomID }: Props) {
-
   const stompClient = useStompClient();
   const [output, setoutput] = useState<any>("");
   const [message, setMessage] = useState<any>("");
