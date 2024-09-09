@@ -16,12 +16,14 @@ function Gameroom() {
   useSubscription("/topic/updateUI/", (message: any) => {});
 
   const loadGameRooms = () => {
+
     fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
       .then((data) => {
         setGamerooms(data);
       });
   };
+
   const checkPlayers = () => {
     fetch(
       "http://localhost:8080/api/gameroom/checkplayer/" +
@@ -147,6 +149,7 @@ function Gameroom() {
           <div style={{ textAlign: "left" }}>
             <button onClick={leaveGameRoom}>Lämna spelrum</button>
           </div>
+
           <div
             style={{
               display: "flex",
@@ -161,6 +164,7 @@ function Gameroom() {
           </div>
         </div>
       )}
+
     </>
   );
 }
