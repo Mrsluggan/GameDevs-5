@@ -6,12 +6,14 @@ interface Props {
   players: string[];
   assignRandomWordToPlayer: (gameRoomID: string, p0: any) => void;
   getRandomPlayer: () => string;
+  clearGameRandomWord: (gameRoomID: string) => void;
 }
-export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, getRandomPlayer }: Props) {
+export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, getRandomPlayer, clearGameRandomWord}: Props) {
   const stompClient = useStompClient();
   const [output, setoutput] = useState<any>("");
   const [message, setMessage] = useState<any>("");
   const [randomWord, setRandomWord] = useState("");
+  const [gameRandomWord, setGameRandomWord] = useState("");
   const [listOfMessages, setListOfMessages] = useState<any[]>([]);
 
   const chatBoxRef = useRef<HTMLUListElement>(null);
@@ -113,7 +115,8 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
           ]);
           console.log("Ny painter ska utses");
           setNewPainter();
-          
+          assignRandomWordToPlayer(gameRoomID, getRandomPlayer());
+          clearGameRandomWord(gameRoomID);
         }
       }
     }
@@ -144,6 +147,7 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [listOfMessages]);
+
 
   return (
     <div>

@@ -19,8 +19,12 @@ function Gameroom() {
   const [gameRandomWord, setgameRandomWord] = useState<string>("");
   const [players, setPlayers] = useState<string[]>([]);
 
-  useSubscription("/topic/updateUI/", (message: any) => {});
-
+  useSubscription("/topic/updateUI/", (message: any) => {
+    const parsedMessage = JSON.parse(message.body);
+    if (parsedMessage.gameRoomID === gameRoomID) {
+      setgameRandomWord(parsedMessage.randomWord);
+    }
+  });
   const loadGameRooms = () => {
     fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
@@ -198,6 +202,11 @@ function Gameroom() {
         console.error("Error fetching random word:", error);
       });
   };
+
+  const clearGameRandomWord = () => {
+    setgameRandomWord(""); 
+  };
+
   const getRandomPlayer = () => {
     const randomIndex = Math.floor(Math.random() * players.length);
     return players[randomIndex];
@@ -261,6 +270,7 @@ function Gameroom() {
                 players={players}
                 assignRandomWordToPlayer={assignRandomWordToPlayer}
                 getRandomPlayer={getRandomPlayer}
+                clearGameRandomWord={clearGameRandomWord}
               />
             </div>
             {gameRandomWord && <h3>Du ska rita: {gameRandomWord}</h3>}
