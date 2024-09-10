@@ -142,7 +142,7 @@ function Gameroom() {
       {!isJoined ? (
         <div id="GameRoomDiv">
           <div>
-            <h2>Guess what this is?</h2>
+            <h2>Gissa ritningen!</h2>
           </div>
           <button onClick={createGame}>Skapa spelrum</button>
           <div style={{ textAlign: "left" }}>
@@ -159,7 +159,6 @@ function Gameroom() {
                     }}
                   >
                     <div>
-                    
                       <h3>{gameroom.gameRoomName}</h3>
                       <p>
                         Ägare: <strong>{gameroom.roomOwner}</strong>
@@ -178,7 +177,7 @@ function Gameroom() {
             </ul>
           </div>
           <div id="lobbyChat">
-          <LobbyChat />
+            <LobbyChat />
           </div>
         </div>
       ) : (

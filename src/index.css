@@ -2,7 +2,7 @@
   background-image: url('assets/artbackground.jpg');
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: black;
   background-color: #242424;
 
   font-synthesis: none;
@@ -41,6 +41,7 @@ button {
   background-color: rgb(252, 151, 69);
   cursor: pointer;
   transition: border-color 0.25s;
+  color: black;
 }
 button:hover {
   border-radius: 25%;

@@ -56,19 +56,29 @@ export default function LobbyChat() {
           }}
         >
           {listOfMessages.map((message: any, index: any) => (
-            <li key={index} style={{ textAlign: message.sender === localStorage.getItem("username") ? "right" : "left" }}>
+            <li
+              key={index}
+              style={{
+                textAlign:
+                  message.sender === localStorage.getItem("username")
+                    ? "right"
+                    : "left",
+              }}
+            >
               {message.sender}: {message.content}
             </li>
           ))}
         </ul>
       </div>
 
-      <div style={{
+      <div
+        style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           textAlign: "center",
-        }}>
+        }}
+      >
         <textarea
           id="lobbyMessageInput"
           style={{
@@ -79,12 +89,16 @@ export default function LobbyChat() {
             marginBottom: "10px",
             resize: "none",
             height: "50px",
+            backgroundColor: "white",
+            color: "black",
           }}
           rows={3}
         />
         <button
           onClick={() => {
-            const inputElement = document.getElementById("lobbyMessageInput") as HTMLInputElement;
+            const inputElement = document.getElementById(
+              "lobbyMessageInput"
+            ) as HTMLInputElement;
             sendMessage(inputElement.value);
             inputElement.value = "";
           }}
