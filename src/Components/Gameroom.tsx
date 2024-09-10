@@ -3,6 +3,9 @@ import Chat from "./Chat";
 import { useStompClient, useSubscription } from "react-stomp-hooks";
 import Canvas from "./Canvas";
 import GameroomPlayers from "./GameroomPlayers";
+import LobbyChat from "./LobbyChat";
+import "./GameStyle.css";
+
 interface gameroom {
   gameRoomName: any;
 }
@@ -125,6 +128,7 @@ function Gameroom() {
                     }}
                   >
                     <div>
+                    
                       <h3>{gameroom.gameRoomName}</h3>
                       <p>
                         Room owner: <strong>{gameroom.roomOwner}</strong>
@@ -141,6 +145,9 @@ function Gameroom() {
                 </li>
               ))}
             </ul>
+          </div>
+          <div id="lobbyChat">
+          <LobbyChat />
           </div>
         </div>
       ) : (
