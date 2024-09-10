@@ -1,0 +1,34 @@
+#lobbyChat {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 400px;
+    height: 700px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.767);
+    z-index: 1000; 
+    text-align: right;
+    margin-top: 100px;
+}
+
+#lobbyChatTitle {
+    text-align: center;
+    text-decoration: underline;
+}
+
+#GameRoomDiv {
+    outline: 5px solid rgb(230, 105, 4);
+    padding: 5px;
+    margin-top: 15px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+h1 {
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: #ee6509;
+    font-weight: 900;
+    font-size: 78px;
+    text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
+  }
