@@ -2,11 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { useStompClient, useSubscription } from "react-stomp-hooks";
 interface Props {
   gameRoomID: string;
+  gameRandomWord: string;
+  players: string[];
+  assignRandomWordToPlayer: (gameRoomID: string, p0: any) => void;
+  getRandomPlayer: () => string;
 }
-export default function Chat({ gameRoomID }: Props) {
+export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, getRandomPlayer }: Props) {
   const stompClient = useStompClient();
   const [output, setoutput] = useState<any>("");
   const [message, setMessage] = useState<any>("");
+  const [randomWord, setRandomWord] = useState("");
   const [listOfMessages, setListOfMessages] = useState<any[]>([]);
 
   const chatBoxRef = useRef<HTMLUListElement>(null);
@@ -23,42 +28,98 @@ export default function Chat({ gameRoomID }: Props) {
     setListOfMessages((prevMessages: string[]) => [...prevMessages, parsed]);
   });
 
+  const fetchGameRandomWord = (gameRoomID: string) => {
+  
+    fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
+      .then(res => res.json())
+      .then(data => {
+        setRandomWord(data.randomWord);
+
+      });
+  }
+  fetchGameRandomWord(gameRoomID)
+
+  const setNewPainter = () => {
+    fetch(`http://localhost:8080/api/gameroom/setpainter/${gameRoomID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      const newPainter = data.painter;
+      if (stompClient) {
+        stompClient.publish({
+          destination: "/app/newPainter/" + gameRoomID,
+          body: JSON.stringify({
+            painter: newPainter,
+          }),
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error setting new painter:", error);
+    });
+  };
+
+
   const sendWelcome = () => {
     let username = localStorage.getItem("username")!;
     if (stompClient) {
       console.log(username);
 
-      //Send Message
-      stompClient.publish({
+  stompClient.publish({
         destination: "/app/welcome/" + gameRoomID,
         body: JSON.stringify({
           username: username,
         }),
       });
-    } else {
-      //Handle error
-    }
-  };
+    } 
+  }
 
   const sendMessage = (message: string) => {
-    if (message.length == 0) {
+    if (message.length === 0) {
       console.log("meddelande saknas");
     } else {
       console.log("skickar meddelande");
       if (stompClient) {
-        //Send Message
+        const sender = localStorage.getItem("username");
         stompClient.publish({
           destination: "/app/message/" + gameRoomID,
           body: JSON.stringify({
             content: message,
-            sender: localStorage.getItem("username"),
+            sender: sender,
           }),
         });
-      } else {
-        //Handle error
+        console.log("Meddelande skickat", message);
+        console.log("Random ord: ", randomWord);
+        
+        
+
+        if (message.toLowerCase().includes(randomWord.toLowerCase())) {
+          const congratsMessage = `Grattis ${sender} du gissade rätt!`;
+          stompClient.publish({
+            destination: "/app/message/" + gameRoomID,
+            body: JSON.stringify({
+              content: congratsMessage,
+              sender: "Server",
+            }),
+          });
+          setListOfMessages((prevMessages: any[]) => [
+            ...prevMessages,
+            { content: congratsMessage, sender: "Server" },
+
+          ]);
+          console.log("Ny painter ska utses");
+          setNewPainter();
+          
+        }
       }
     }
   };
+
+
 
   const loadMessags = (gameRoomID: string) => {
     fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
@@ -66,18 +127,17 @@ export default function Chat({ gameRoomID }: Props) {
       .then((data) => {
         console.log(data.roomChat.listOfMessages);
         data.roomChat.listOfMessages.forEach((message: any) => {
-          setListOfMessages((prevMessages: any[]) => [
-            ...prevMessages,
-            message,
-          ]);
-        });
-      });
-  };
+          setListOfMessages((prevMessages: any[]) => [...prevMessages, message]);
+        })
+      })
+  }
+
 
   useEffect(() => {
-    sendWelcome();
-    loadMessags(gameRoomID);
-  }, []);
+    sendWelcome()
+    loadMessags(gameRoomID)
+  }, [gameRoomID]);
+
 
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -161,3 +221,5 @@ export default function Chat({ gameRoomID }: Props) {
     </div>
   );
 }
+
+

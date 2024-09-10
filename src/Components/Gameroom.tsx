@@ -10,11 +10,14 @@ interface gameroom {
   gameRoomName: any;
 }
 
+
 function Gameroom() {
   const stompClient = useStompClient();
   const [gamerooms, setGamerooms] = useState<any[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [gameRoomID, setGameRoomID] = useState<string>("");
+  const [gameRandomWord, setgameRandomWord] = useState<string>("");
+  const [players, setPlayers] = useState<string[]>([]);
 
   useSubscription("/topic/updateUI/", (message: any) => {});
 
@@ -78,6 +81,18 @@ function Gameroom() {
       body: JSON.stringify({
         username: localStorage.getItem("username"),
       }),
+
+    }).then(() => {
+      fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
+        .then((res) => res.json())
+        .then((data) => {
+          setPlayers(data.listOfPlayers);
+          if (data.listOfPlayers.length === 1) {
+            assignRandomWordToPlayer(gameRoomID, data.listOfPlayers[0]);
+          } else {
+            fetchPlayerWithRandomWord(gameRoomID);
+          }
+        });
     });
   };
 
@@ -129,12 +144,64 @@ function Gameroom() {
 
     setIsJoined(false);
     loadGameRooms();
+    setgameRandomWord("");
   };
 
   useEffect(() => {
     loadGameRooms();
     checkPlayers();
   }, []);
+
+  const assignRandomWordToPlayer = (gameRoomID: string, player: any) => {
+    fetch(`http://localhost:8080/api/gameroom/setpainter/${gameRoomID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: player.username,
+      }),
+    }).then(() => {
+      fetchRandomWord(gameRoomID);
+    });
+  };
+  
+  
+  const fetchPlayerWithRandomWord = (gameRoomID: string) => {
+    fetch(`http://localhost:8080/api/gameroom/painter/${gameRoomID}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.username === localStorage.getItem("username")) {
+          fetchRandomWord(gameRoomID);
+        } else {
+          setgameRandomWord("");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching painter:", error);
+      });
+  };
+  
+  const fetchRandomWord = (gameRoomID: string) => {
+    fetch(`http://localhost:8080/api/gameroom/randomword/${gameRoomID}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Random word not found");
+        }
+        return res.text(); 
+      })
+      .then((data) => {
+        console.log("Fetched random word:", data);
+        setgameRandomWord(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching random word:", error);
+      });
+  };
+  const getRandomPlayer = () => {
+    const randomIndex = Math.floor(Math.random() * players.length);
+    return players[randomIndex];
+  };
 
   return (
     <>
@@ -180,29 +247,28 @@ function Gameroom() {
             <LobbyChat />
           </div>
         </div>
-      ) : (
-        /* här är canvas */
-        <div style={{ padding: "2%" }}>
-          <div style={{ textAlign: "left" }}>
-            <button onClick={leaveGameRoom}>Lämna spelrum</button>
+      ):(
+          <div style={{ padding: "2%" }}>
+            <div style={{ textAlign: "left" }}>
+              <button onClick={leaveGameRoom}>Lämna spelrum</button>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+              <GameroomPlayers gameRoomID={gameRoomID} />
+              <Canvas gameRoomID={gameRoomID} />
+              <Chat
+                gameRoomID={gameRoomID}
+                gameRandomWord={gameRandomWord}
+                players={players}
+                assignRandomWordToPlayer={assignRandomWordToPlayer}
+                getRandomPlayer={getRandomPlayer}
+              />
+            </div>
+            {gameRandomWord && <h3>Du ska rita: {gameRandomWord}</h3>}
           </div>
+        )}
+      </>
+    );
+  }
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <GameroomPlayers gameRoomID={gameRoomID} />
-            <Canvas gameRoomID={gameRoomID} />
-            <Chat gameRoomID={gameRoomID} />
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
 
 export default Gameroom;
