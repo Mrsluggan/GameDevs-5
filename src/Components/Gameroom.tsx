@@ -16,7 +16,6 @@ function Gameroom() {
   useSubscription("/topic/updateUI/", (message: any) => {});
 
   const loadGameRooms = () => {
-
     fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
       .then((data) => {
@@ -79,8 +78,41 @@ function Gameroom() {
     });
   };
 
+  const resetPlayerPoints = () => {
+    const username = localStorage.getItem("username");
+
+    fetch(`http://localhost:8080/reset-points/${username}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Kunde inte nollställa poäng");
+        }
+      })
+      .then((data) => {
+        console.log("Poäng nollställdes", data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const leaveGameRoom = () => {
+    const confirmed = window.confirm(
+      "Om du lämnar nollställs din poäng, vill du lämna ändå?"
+    );
+    if (!confirmed) {
+      return;
+    }
+
     console.log(gameRoomID);
+
+    resetPlayerPoints();
 
     fetch("http://localhost:8080/api/gameroom/leave/" + gameRoomID, {
       method: "PUT",
@@ -109,8 +141,7 @@ function Gameroom() {
           <div>
             <h2>Guess what this is?</h2>
           </div>
-          create new game:{" "}
-          <button onClick={createGame}>Create new game room</button>
+          <button onClick={createGame}>Skapa spelrum</button>
           <div style={{ textAlign: "left" }}>
             <ul style={{ listStyle: "none" }}>
               {gamerooms.map((gameroom) => (
@@ -127,13 +158,13 @@ function Gameroom() {
                     <div>
                       <h3>{gameroom.gameRoomName}</h3>
                       <p>
-                        Room owner: <strong>{gameroom.roomOwner}</strong>
+                        Ägare: <strong>{gameroom.roomOwner}</strong>
                       </p>
-                      current players: {gameroom.listOfPlayers.length}
+                      Deltagare: {gameroom.listOfPlayers.length}
                     </div>
                     <div>
                       <button onClick={() => joinGame(gameroom.id)}>
-                        Join game
+                        Gå med
                       </button>
                     </div>
                   </div>
@@ -164,7 +195,6 @@ function Gameroom() {
           </div>
         </div>
       )}
-
     </>
   );
 }

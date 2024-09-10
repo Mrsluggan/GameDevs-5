@@ -15,9 +15,7 @@ function Leaderboard() {
 
   const fetchTopUsers = async () => {
     try {
-      const res = await fetch(
-        "https://monkfish-app-xpltr.ondigitalocean.app/get-top-users"
-      );
+      const res = await fetch("http://localhost:8080/get-top-users");
       const data = await res.json();
       setUsers(data);
     } catch (error) {
