@@ -6,7 +6,7 @@ interface Props {
   players: string[];
   assignRandomWordToPlayer: (gameRoomID: string, p0: any) => void;
   getRandomPlayer: () => string;
-  clearGameRandomWord: () => void;
+  clearGameRandomWord: (gameRoomID: string) => void;
 }
 export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, getRandomPlayer, clearGameRandomWord}: Props) {
   const stompClient = useStompClient();
@@ -39,7 +39,7 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
 
       });
   }
-
+  fetchGameRandomWord(gameRoomID)
 
   const setNewPainter = () => {
     fetch(`http://localhost:8080/api/gameroom/setpainter/${gameRoomID}`, {
@@ -116,7 +116,7 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
           console.log("Ny painter ska utses");
           setNewPainter();
           assignRandomWordToPlayer(gameRoomID, getRandomPlayer());
-          clearGameRandomWord();
+          clearGameRandomWord(gameRoomID);
         }
       }
     }
@@ -138,7 +138,6 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
 
   useEffect(() => {
     sendWelcome()
-    fetchGameRandomWord(gameRoomID)
     loadMessags(gameRoomID)
   }, [gameRoomID]);
 
