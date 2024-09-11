@@ -4,9 +4,11 @@ import { useEffect, useRef, useState, MouseEvent } from 'react';
 
 interface Props {
     gameRoomID: string;
+    isPainter: boolean;
+
 }
 
-const Canvas = ({ gameRoomID }: Props) => {
+const Canvas = ({ gameRoomID, isPainter }: Props) => {
     const canvasInput = useRef<HTMLCanvasElement>(null);
     const [holding, setHolding] = useState(false);
     const stompClient = useStompClient();
@@ -108,30 +110,42 @@ const Canvas = ({ gameRoomID }: Props) => {
         }
     };
 
-    useEffect(() => {
-        console.log(gameRoomID);
-    }, [gameRoomID]);
+
 
     return (
         <div>
-            <canvas
-                ref={canvasInput}
-                width="500"
-                height="500"
-                style={{ border: "1px solid red", backgroundColor: "white" }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-            />
-            <div style={{ display: "flex", alignContent: "center", justifyContent: "center" }}>
-                <button onClick={() => setColor("red")}>Röd</button>
-                <button onClick={() => setColor("blue")}>Blå</button>
-                <button onClick={() => setColor("yellow")}>Gul</button>
-                <button onClick={() => setColor("green")}>Grön</button>
-                <button onClick={() => setColor("white")}>sudda</button>
-                <button onClick={handleClearCanvas}>CLEAR</button>
-            </div>
+
+            {isPainter ? (
+                <div>
+                    <canvas
+                        ref={canvasInput}
+                        width="500"
+                        height="500"
+                        style={{ border: "1px solid red", backgroundColor: "white" }}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                    />
+                    <div style={{ display: "flex", alignContent: "center", justifyContent: "center" }}>
+                        <button onClick={() => setColor("red")}>Röd</button>
+                        <button onClick={() => setColor("blue")}>Blå</button>
+                        <button onClick={() => setColor("yellow")}>Gul</button>
+                        <button onClick={() => setColor("green")}>Grön</button>
+                        <button onClick={() => setColor("white")}>sudda</button>
+                        <button onClick={handleClearCanvas}>CLEAR</button>
+                    </div>
+                </div>
+            ) : (
+                <canvas
+                    ref={canvasInput}
+                    width="500"
+                    height="500"
+                    style={{ border: "1px solid red", backgroundColor: "white" }}
+
+                />
+            )
+            }
         </div>
     );
 };

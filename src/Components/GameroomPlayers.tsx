@@ -7,28 +7,19 @@ interface Player {
 
 interface GameroomPlayersProps {
   gameRoomID: string;
+  players: any[];
 }
 
-function GameroomPlayers({ gameRoomID }: GameroomPlayersProps) {
-  const [players, setPlayers] = useState<any[]>([]);
+function GameroomPlayers({ gameRoomID, players }: GameroomPlayersProps) {
 
-  const loadPlayers = () => {
-    fetch(`http://localhost:8080/api/gameroom/${gameRoomID}/players`)
-      .then((res) => res.json())
-      .then((data) => {
-        const sortedPlayers = data.sort(
-          (a: Player, b: Player) => b.currentPoints - a.currentPoints
-        );
-        setPlayers(sortedPlayers);
-      })
-      .catch((error) => {
-        console.error("Fel vid hämtning av spelare:", error);
-      });
-  };
 
   useEffect(() => {
-    loadPlayers();
-  }, [gameRoomID]);
+    console.log(players + " nu uppdateras det");
+    players.forEach((element) =>{
+      console.log(element);
+      
+    })
+  }, [players]);
 
   return (
     <div>
