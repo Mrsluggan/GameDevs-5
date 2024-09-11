@@ -47,9 +47,14 @@ function Gameroom() {
   };
 
   const createGame = () => {
-    console.log("hej!");
-
     let gameroomName = prompt("Enter gameroom name");
+    if (gameroomName == null) {
+      return;
+    }
+    if (!gameroomName || gameroomName.trim().length === 0) {
+      alert("Du måste ange ett namn på rummet");
+      return;
+    }
     fetch("http://localhost:8080/api/gameroom/create", {
       method: "POST",
       headers: {
@@ -65,6 +70,28 @@ function Gameroom() {
         console.log(data);
         loadGameRooms();
       });
+  };
+
+  const deleteGameRoom = (gameRoomID: string, roomOwner: string) => {
+    const confirmed = window.confirm("Vill du verkligen radera ditt rum?");
+    if (!confirmed) {
+      return;
+    }
+    fetch (`http://localhost:8080/api/gameroom/delete/${gameRoomID}/${roomOwner}`, 
+      {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => {
+      if (res.ok) {
+        console.log("Game deleted");
+      } else {
+        console.error("Error deleting game");
+      }
+      loadGameRooms();
+    });
   };
 
   const joinGame = (gameRoomID: string) => {
@@ -239,6 +266,10 @@ function Gameroom() {
                       <button onClick={() => joinGame(gameroom.id)}>
                         Gå med
                       </button>
+                        {localStorage.getItem("username") === gameroom.roomOwner && (
+                        <button onClick={() => deleteGameRoom(gameroom.id, gameroom.roomOwner )}> Ta bort rum</button>
+                        )}
+                 
                     </div>
                   </div>
                   <hr />
