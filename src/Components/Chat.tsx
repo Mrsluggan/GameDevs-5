@@ -115,6 +115,11 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
           assignRandomWordToPlayer(gameRoomID, getRandomPlayer());
           clearGameRandomWord(gameRoomID);
 
+          stompClient.publish({
+            destination: "/app/clearcanvas/" + gameRoomID,
+            body: JSON.stringify({}),
+          });
+
           // Fetch to reward points only to the winner
           fetch(`http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`, {
             method: "POST",
