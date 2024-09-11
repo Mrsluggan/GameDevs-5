@@ -19,12 +19,6 @@ function Gameroom() {
   const [gameRandomWord, setgameRandomWord] = useState<string>("");
   const [players, setPlayers] = useState<string[]>([]);
 
-  useSubscription("/topic/updateUI/", (message: any) => {
-    const parsedMessage = JSON.parse(message.body);
-    if (parsedMessage.gameRoomID === gameRoomID) {
-      setgameRandomWord(parsedMessage.randomWord);
-    }
-  });
   const loadGameRooms = () => {
     fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
