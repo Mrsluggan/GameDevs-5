@@ -175,7 +175,7 @@ function Gameroom() {
     fetch(`http://localhost:8080/api/gameroom/painter/${gameRoomID}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.username === localStorage.getItem("username")) {
+        if (data.username === data.painter) {
           fetchRandomWord(gameRoomID);
         } else {
           setgameRandomWord("");
@@ -204,7 +204,7 @@ function Gameroom() {
   };
 
   const clearGameRandomWord = () => {
-    setgameRandomWord(""); 
+      setgameRandomWord(""); 
   };
 
   const getRandomPlayer = () => {
@@ -273,7 +273,7 @@ function Gameroom() {
                 clearGameRandomWord={clearGameRandomWord}
               />
             </div>
-            {gameRandomWord && <h3>Du ska rita: {gameRandomWord}</h3>}
+            {gameRandomWord && gameRandomWord.length > 0 && <h3>Du ska rita: {gameRandomWord}</h3>}
           </div>
         )}
       </>
