@@ -97,8 +97,6 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
         console.log("Meddelande skickat", message);
         console.log("Random ord: ", randomWord);
         
-        
-
         if (message.toLowerCase().includes(randomWord.toLowerCase())) {
           const congratsMessage = `Grattis ${sender} du gissade rätt!`;
           stompClient.publish({
@@ -111,16 +109,31 @@ export default function Chat({ gameRoomID, players, assignRandomWordToPlayer, ge
           setListOfMessages((prevMessages: any[]) => [
             ...prevMessages,
             { content: congratsMessage, sender: "Server" },
-
           ]);
           console.log("Ny painter ska utses");
           setNewPainter();
           assignRandomWordToPlayer(gameRoomID, getRandomPlayer());
           clearGameRandomWord(gameRoomID);
+
+          // Fetch to reward points only to the winner
+          fetch(`http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          .then(response => response.text()) // Expecting plain text response
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => {
+            console.error("Error rewarding points:", error);
+          });
         }
       }
     }
   };
+
 
 
 
