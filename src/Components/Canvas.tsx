@@ -8,27 +8,40 @@ interface Props {
 
 const Canvas = ({ gameRoomID }: Props) => {
     const canvasInput = useRef<HTMLCanvasElement>(null);
-    const context = canvasInput.current?.getContext("2d");
     const [holding, setHolding] = useState(false);
     const stompClient = useStompClient();
     const [color, setColor] = useState('red');
-  
-    useSubscription("/topic/updatecanvas/" + gameRoomID, (message: any) => {
-        console.log(message.body);
-        let parsed = JSON.parse(message.body);
-        console.log(parsed);
 
-        if (canvasInput?.current && context) {
-            drawImage(parsed.x, parsed.y);
+
+    const getContext = () => {
+        if (canvasInput.current) {
+            return canvasInput.current.getContext('2d');
+        }
+        return null;
+    };
+
+    useEffect(() => {
+        const context = getContext();
+        if (context) {
+
+        }
+    }, []);
+
+    useSubscription("/topic/updatecanvas/" + gameRoomID, (message: any) => {
+        const parsed = JSON.parse(message.body);
+        setColor(parsed.color);
+        const context = getContext();
+        if (canvasInput.current && context) {
+            drawImage(parsed.x, parsed.y, parsed.color);
         }
     });
 
     useSubscription("/topic/clearcanvas/" + gameRoomID, () => {
-        if (canvasInput?.current && context) {
+        const context = getContext();
+        if (canvasInput.current && context) {
             context.clearRect(0, 0, canvasInput.current.width, canvasInput.current.height);
         }
-     });
-
+    });
 
     const getMousePos = (canvas: HTMLCanvasElement, event: MouseEvent) => {
         const rect = canvas.getBoundingClientRect();
@@ -38,24 +51,24 @@ const Canvas = ({ gameRoomID }: Props) => {
         };
     };
 
-    const drawImage = (x: number, y: number) => {
-        if (canvasInput?.current && context) {
+    const drawImage = (x: number, y: number, color: string) => {
+        const context = getContext();
+        if (canvasInput.current && context) {
             context.fillStyle = color;
             context.beginPath();
             context.arc(x + 5, y + 5, 5, 0, 2 * Math.PI);
-            context.fillStyle = color;
             context.fill();
-        };
-
-
+        }
     };
-    const publishDraw = (x: number, y: number) => {
+
+    const publishDraw = (x: number, y: number, color: string) => {
         if (stompClient) {
             stompClient.publish({
                 destination: "/app/updatecanvase/" + gameRoomID,
                 body: JSON.stringify({
                     x: x,
-                    y: y
+                    y: y,
+                    color: color,
                 }),
             });
         } else {
@@ -66,15 +79,15 @@ const Canvas = ({ gameRoomID }: Props) => {
     const handleMouseDown = (event: MouseEvent) => {
         setHolding(true);
         const { x, y } = getMousePos(canvasInput.current!, event);
-        drawImage(x, y);
-        publishDraw(x, y);
+        drawImage(x, y, color);
+        publishDraw(x, y, color);
     };
 
     const handleMouseMove = (event: MouseEvent) => {
         if (holding && canvasInput?.current) {
             const { x, y } = getMousePos(canvasInput.current, event);
-            drawImage(x, y);
-            publishDraw(x, y);
+            drawImage(x, y, color);
+            publishDraw(x, y, color);
         }
     };
 
@@ -83,22 +96,22 @@ const Canvas = ({ gameRoomID }: Props) => {
     };
 
     const handleClearCanvas = () => {
+        const context = getContext();
         if (canvasInput?.current && context) {
-          context.clearRect(0, 0, canvasInput.current.width, canvasInput.current.height);
-          if (stompClient) {
-            stompClient.publish({
-              destination: "/app/clearcanvas/" + gameRoomID,
-              body: JSON.stringify({}),
-            });
-          }
+            context.clearRect(0, 0, canvasInput.current.width, canvasInput.current.height);
+            if (stompClient) {
+                stompClient.publish({
+                    destination: "/app/clearcanvas/" + gameRoomID,
+                    body: JSON.stringify({}),
+                });
+            }
         }
-      };
-    
-      useEffect(() => {
-        console.log(gameRoomID);
-      }, [gameRoomID]);
+    };
 
- 
+    useEffect(() => {
+        console.log(gameRoomID);
+    }, [gameRoomID]);
+
     return (
         <div>
             <canvas
@@ -110,8 +123,7 @@ const Canvas = ({ gameRoomID }: Props) => {
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
-            // För att stoppa rita om musen lämnar canvas
-            ></canvas>
+            />
             <div style={{ display: "flex", alignContent: "center", justifyContent: "center" }}>
                 <button onClick={() => setColor("red")}>Röd</button>
                 <button onClick={() => setColor("blue")}>Blå</button>
@@ -119,9 +131,7 @@ const Canvas = ({ gameRoomID }: Props) => {
                 <button onClick={() => setColor("green")}>Grön</button>
                 <button onClick={() => setColor("white")}>sudda</button>
                 <button onClick={handleClearCanvas}>CLEAR</button>
-
             </div>
-            
         </div>
     );
 };
