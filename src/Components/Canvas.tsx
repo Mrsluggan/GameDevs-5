@@ -12,7 +12,7 @@ const Canvas = ({ gameRoomID }: Props) => {
     const [holding, setHolding] = useState(false);
     const stompClient = useStompClient();
     const [color, setColor] = useState('red');
-    // Prenumerera på kanvasuppdateringar från servern
+  
     useSubscription("/topic/updatecanvas/" + gameRoomID, (message: any) => {
         console.log(message.body);
         let parsed = JSON.parse(message.body);
@@ -22,6 +22,13 @@ const Canvas = ({ gameRoomID }: Props) => {
             drawImage(parsed.x, parsed.y);
         }
     });
+
+    useSubscription("/topic/clearcanvas/" + gameRoomID, () => {
+        if (canvasInput?.current && context) {
+            context.clearRect(0, 0, canvasInput.current.width, canvasInput.current.height);
+        }
+     });
+
 
     const getMousePos = (canvas: HTMLCanvasElement, event: MouseEvent) => {
         const rect = canvas.getBoundingClientRect();
@@ -75,10 +82,23 @@ const Canvas = ({ gameRoomID }: Props) => {
         setHolding(false);
     };
 
-    useEffect(() => {
+    const handleClearCanvas = () => {
+        if (canvasInput?.current && context) {
+          context.clearRect(0, 0, canvasInput.current.width, canvasInput.current.height);
+          if (stompClient) {
+            stompClient.publish({
+              destination: "/app/clearcanvas/" + gameRoomID,
+              body: JSON.stringify({}),
+            });
+          }
+        }
+      };
+    
+      useEffect(() => {
         console.log(gameRoomID);
-    }, [gameRoomID]);
+      }, [gameRoomID]);
 
+ 
     return (
         <div>
             <canvas
@@ -98,7 +118,7 @@ const Canvas = ({ gameRoomID }: Props) => {
                 <button onClick={() => setColor("yellow")}>Gul</button>
                 <button onClick={() => setColor("green")}>Grön</button>
                 <button onClick={() => setColor("white")}>sudda</button>
-                <button onClick={() => context?.clearRect(0, 0, 500, 500)}>CLEAR</button>
+                <button onClick={handleClearCanvas}>CLEAR</button>
 
             </div>
             
