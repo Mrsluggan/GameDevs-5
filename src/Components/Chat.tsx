@@ -15,6 +15,7 @@ interface Props {
   setIsPainter: (isPainter: boolean) => void;
   wonRound: () => void;
 }
+
 export default function Chat({
   gameRoomID,
   randomWord,
@@ -48,6 +49,27 @@ export default function Chat({
       });
     }
   };
+
+  const announceWinner = (winner: string) => {
+    if (stompClient) {
+      stompClient.publish({
+        destination: "/app/message/" + gameRoomID,
+        body: JSON.stringify({
+          content: `${winner} gissade rätt!`,
+          sender: "System",
+        }),
+      });
+      stompClient.publish({
+        destination: "/app/clearcanvas/" + gameRoomID,
+      });
+      if (stompClient) {
+        stompClient.publish({
+          destination: "/app/updategame/" + gameRoomID,
+        });
+      }
+    }
+  };
+
   const checkGuess = (message: string, currentWord: string) => {
     const sender = localStorage.getItem("username");
 
@@ -55,7 +77,7 @@ export default function Chat({
       wonRound();
 
       fetch(
-        `https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/rewardPoints?username=${sender}`,
+        `http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`,
         {
           method: "POST",
           headers: {
@@ -70,6 +92,16 @@ export default function Chat({
         .catch((error) => {
           console.error("Error rewarding points:", error);
         });
+        if (stompClient) {
+          stompClient.publish({
+            destination: "/app/updategame/" + gameRoomID,
+          });
+        }
+      if (sender) {
+        announceWinner(sender);
+      } else {
+        console.error("Sender is null");
+      }
     }
   };
 
@@ -94,7 +126,7 @@ export default function Chat({
 
   const loadMessags = (gameRoomID: string) => {
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" + gameRoomID
+      "http://localhost:8080/api/gameroom/" + gameRoomID
     )
       .then((res) => res.json())
       .then((data) => {
@@ -168,14 +200,11 @@ export default function Chat({
                 marginBottom: "10px",
                 backgroundColor: "white",
                 color: "black",
-
                 resize: "none",
                 height: "50px",
               }}
               rows={3}
             />
-
-            {/* Vi måste hitta ett bättre sätt att göra dettta? liksom va fan är de här för knapp lol*/}
 
             <button
               onClick={() => {
