@@ -10,7 +10,6 @@ interface gameroom {
   gameRoomName: any;
 }
 
-
 function Gameroom() {
   const stompClient = useStompClient();
   const [gamerooms, setGamerooms] = useState<any[]>([]);
@@ -18,6 +17,29 @@ function Gameroom() {
   const [gameRoomID, setGameRoomID] = useState<string>("");
   const [gameRandomWord, setgameRandomWord] = useState<string>("");
   const [players, setPlayers] = useState<string[]>([]);
+
+  useSubscription("/topic/gamerooms", (message) => {
+    const newGameRoom = JSON.parse(message.body);
+    setGamerooms((prevGamerooms) => [...prevGamerooms, newGameRoom]);
+  });
+
+  useSubscription(`/topic/updategameroom/${gameRoomID}`, (message) => {
+    const updatedGameRoom = JSON.parse(message.body);
+    setGamerooms((prevGamerooms) =>
+      prevGamerooms.map((room) =>
+        room.id === updatedGameRoom.id ? updatedGameRoom : room
+      )
+    );
+  });
+
+  useSubscription("/topic/gamerooms/delete", (message) => {
+    const deletedGameRoomID = message.body;
+    setGamerooms((prevGamerooms) =>
+      prevGamerooms.filter((room) => room.id !== deletedGameRoomID)
+    );
+  });
+
+
 
   const loadGameRooms = () => {
     fetch("http://localhost:8080/api/gameroom/")
@@ -175,6 +197,7 @@ function Gameroom() {
   useEffect(() => {
     loadGameRooms();
     checkPlayers();
+    fetchPlayerWithRandomWord(gameRoomID);
   }, []);
 
   const assignRandomWordToPlayer = (gameRoomID: string, player: any) => {
@@ -196,7 +219,7 @@ function Gameroom() {
     fetch(`http://localhost:8080/api/gameroom/painter/${gameRoomID}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.username === data.painter) {
+        if (localStorage.getItem("username")=== data.painter) {
           fetchRandomWord(gameRoomID);
         } else {
           setgameRandomWord("");
