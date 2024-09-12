@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useStompClient, useSubscription } from "react-stomp-hooks";
+
+interface Message {
+  content: string;
+  sender: string;
+}
+
 interface Props {
   gameRoomID: string;
   players: string[];
@@ -7,33 +13,33 @@ interface Props {
   painter: string;
   isPainter: boolean;
   setIsPainter: (isPainter: boolean) => void;
-  wonRound: () => void;  
-
-
+  wonRound: () => void;
 }
-export default function Chat({ gameRoomID, players, randomWord, painter, isPainter, setIsPainter,wonRound }: Props) {
+export default function Chat({
+  gameRoomID,
+  randomWord,
+  isPainter,
+  wonRound,
+}: Props) {
   const stompClient = useStompClient();
-  const [listOfMessages, setListOfMessages] = useState<any[]>([]);
+  const [listOfMessages, setListOfMessages] = useState<Message[]>([]);
   const chatBoxRef = useRef<HTMLUListElement>(null);
 
-  useSubscription("/topic/welcome/" + gameRoomID, (message: any) => {
-    let parsed = JSON.parse(message.body);
+  useSubscription("/topic/welcome/" + gameRoomID, (message) => {
+    const parsed = JSON.parse(message.body);
     console.log(parsed);
-    setListOfMessages((prevMessages: any[]) => [...prevMessages, parsed]);
+    setListOfMessages((prevMessages) => [...prevMessages, parsed]);
   });
 
-  useSubscription("/topic/message/" + gameRoomID, (message: any) => {
-    let parsed = JSON.parse(message.body);
+  useSubscription("/topic/message/" + gameRoomID, (message) => {
+    const parsed = JSON.parse(message.body);
     console.log(parsed);
-    setListOfMessages((prevMessages: string[]) => [...prevMessages, parsed]);
+    setListOfMessages((prevMessages) => [...prevMessages, parsed]);
   });
-
-
 
   const sendWelcome = () => {
-    let username = localStorage.getItem("username")!;
+    const username = localStorage.getItem("username")!;
     if (stompClient) {
-
       stompClient.publish({
         destination: "/app/welcome/" + gameRoomID,
         body: JSON.stringify({
@@ -41,15 +47,12 @@ export default function Chat({ gameRoomID, players, randomWord, painter, isPaint
         }),
       });
     }
-  }
+  };
   const checkGuess = (message: string, currentWord: string) => {
-
-
     if (message.toLowerCase() === currentWord.toLowerCase()) {
       wonRound();
     }
-
-  }
+  };
 
   const sendMessage = (message: string) => {
     if (message.length === 0) {
@@ -68,37 +71,28 @@ export default function Chat({ gameRoomID, players, randomWord, painter, isPaint
         });
       }
     }
-  }
-
-
-
-
+  };
 
   const loadMessags = (gameRoomID: string) => {
     fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
       .then((res) => res.json())
       .then((data) => {
-        data.roomChat.listOfMessages.forEach((message: any) => {
-          setListOfMessages((prevMessages: any[]) => [...prevMessages, message]);
-        })
-      })
-  }
-
+        data.roomChat.listOfMessages.forEach((message: Message) => {
+          setListOfMessages((prevMessages) => [...prevMessages, message]);
+        });
+      });
+  };
 
   useEffect(() => {
-    sendWelcome()
-    loadMessags(gameRoomID)
+    sendWelcome();
+    loadMessags(gameRoomID);
   }, [gameRoomID]);
 
-
-
   useEffect(() => {
-
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [listOfMessages]);
-
 
   return (
     <div>
@@ -116,7 +110,7 @@ export default function Chat({ gameRoomID, players, randomWord, painter, isPaint
             padding: "10px",
           }}
         >
-          {listOfMessages.map((message: any, index: any) => {
+          {listOfMessages.map((message, index) => {
             if (message.sender === localStorage.getItem("username")) {
               return (
                 <li key={index} style={{ textAlign: "right" }}>
@@ -141,12 +135,12 @@ export default function Chat({ gameRoomID, players, randomWord, painter, isPaint
           textAlign: "center",
         }}
       >
-        {!isPainter &&
+        {!isPainter && (
           <div>
             <textarea
               id="messageInput"
               style={{
-                width: "80%", // Sätter bredd för att matcha meddelandena
+                width: "80%",
                 padding: "10px",
                 borderRadius: "10px",
                 border: "1px solid #ccc",
@@ -154,8 +148,8 @@ export default function Chat({ gameRoomID, players, randomWord, painter, isPaint
                 backgroundColor: "white",
                 color: "black",
 
-                resize: "none", // Förhindrar användaren från att ändra storlek på textrutan
-                height: "50px", // Höjden för textarea
+                resize: "none",
+                height: "50px",
               }}
               rows={3}
             />
@@ -176,12 +170,8 @@ export default function Chat({ gameRoomID, players, randomWord, painter, isPaint
               Skicka
             </button>
           </div>
-        }
+        )}
       </div>
     </div>
-
-
   );
 }
-
-

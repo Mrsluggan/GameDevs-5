@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { useStompClient, useSubscription } from "react-stomp-hooks";
+import { IMessage, useStompClient, useSubscription } from "react-stomp-hooks";
+
+interface Message {
+  content: string;
+  sender: string;
+}
 
 export default function LobbyChat() {
   const stompClient = useStompClient();
-  const [listOfMessages, setListOfMessages] = useState<any[]>([]);
+  const [listOfMessages, setListOfMessages] = useState<Message[]>([]);
   const chatBoxRef = useRef<HTMLUListElement>(null);
 
-  // Subscription for the general lobby chat
-  useSubscription("/topic/lobby", (message: any) => {
+  useSubscription("/topic/lobby", (message: IMessage) => {
     try {
-      let parsed = JSON.parse(message.body);
+      const parsed: Message = JSON.parse(message.body);
       setListOfMessages((prevMessages) => [...prevMessages, parsed]);
     } catch (e) {
+      console.error("Fel:", e);
       console.error("Invalid JSON message:", message.body);
     }
   });
@@ -26,7 +31,7 @@ export default function LobbyChat() {
           destination: "/app/lobby",
           body: JSON.stringify({
             content: message,
-            sender: localStorage.getItem("username"),
+            sender: localStorage.getItem("username") || "Unknown",
           }),
         });
       }
@@ -55,7 +60,7 @@ export default function LobbyChat() {
             padding: "10px",
           }}
         >
-          {listOfMessages.map((message: any, index: any) => (
+          {listOfMessages.map((message, index) => (
             <li
               key={index}
               style={{
