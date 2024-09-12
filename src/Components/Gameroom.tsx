@@ -33,6 +33,29 @@ function Gameroom() {
     setCurrentWord(parsed.randomWord);
   });
 
+  useSubscription("/topic/gamerooms", (message) => {
+    const newGameRoom = JSON.parse(message.body);
+    setGamerooms((prevGamerooms) => [...prevGamerooms, newGameRoom]);
+  });
+
+  useSubscription(`/topic/updategameroom/${gameRoomID}`, (message) => {
+    const updatedGameRoom = JSON.parse(message.body);
+    setGamerooms((prevGamerooms) =>
+      prevGamerooms.map((room) =>
+        room.id === updatedGameRoom.id ? updatedGameRoom : room
+      )
+    );
+  });
+
+  useSubscription("/topic/gamerooms/delete", (message) => {
+    const deletedGameRoomID = message.body;
+    setGamerooms((prevGamerooms) =>
+      prevGamerooms.filter((room) => room.id !== deletedGameRoomID)
+    );
+  });
+
+
+
   const loadGameRooms = () => {
     fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
@@ -202,6 +225,7 @@ function Gameroom() {
     loadGameRooms();
     checkPlayers();
   }, []);
+
 
 
   return (
