@@ -6,13 +6,18 @@ import GameroomPlayers from "./GameroomPlayers";
 import LobbyChat from "./LobbyChat";
 import "./GameStyle.css";
 
+interface Player {
+  username: string;
+  currentPoints: number;
+}
 interface GameRoom {
   id: string;
   gameRoomName: string;
   roomOwner: string;
-  listOfPlayers: string[];
+  listOfPlayers: Player[];
   painter: string;
   randomWord: string;
+  players: Player[];
 }
 
 function Gameroom() {
@@ -20,7 +25,7 @@ function Gameroom() {
   const [gamerooms, setGamerooms] = useState<GameRoom[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [gameRoomID, setGameRoomID] = useState<string>("");
-  const [players, setPlayers] = useState<string[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [roomOwner, setRoomOwner] = useState<boolean>(false);
 
   const [painter, setPainter] = useState<string>("");
@@ -28,9 +33,10 @@ function Gameroom() {
 
   const [currentWord, setCurrentWord] = useState<string>("");
 
-  useSubscription("/topic/updategame/" + gameRoomID, (message) => {
+  useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
     const parsed = JSON.parse(message.body);
     console.log("Received painter from WebSocket:", parsed.painter);
+    loadPlayers();
     setPlayers(parsed.listOfPlayers);
     console.log(players);
 
@@ -45,6 +51,7 @@ function Gameroom() {
 
   useSubscription(`/topic/updategameroom/${gameRoomID}`, (message) => {
     const updatedGameRoom = JSON.parse(message.body);
+    loadPlayers();
     setGamerooms((prevGamerooms) =>
       prevGamerooms.map((room) =>
         room.id === updatedGameRoom.id ? updatedGameRoom : room
@@ -58,6 +65,14 @@ function Gameroom() {
       prevGamerooms.filter((room) => room.id !== deletedGameRoomID)
     );
   });
+
+  const loadPlayers = () => {
+    fetch("http://localhost:8080/api/gameroom/" + gameRoomID + "/players")
+      .then((res) => res.json())
+      .then((data) => {
+        setPlayers(data);
+      });
+  };
 
   const loadGameRooms = () => {
     fetch("https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/")
@@ -225,6 +240,8 @@ function Gameroom() {
     )
       .then((res) => res.json())
       .then(() => {});
+    
+      
 
     if (stompClient) {
       stompClient.publish({
@@ -320,6 +337,7 @@ function Gameroom() {
           ) : (
             <h2>Den som ritar är: {painter}</h2>
           )}
+          
           <div
             style={{
               display: "flex",
@@ -328,7 +346,7 @@ function Gameroom() {
               gap: "10px",
             }}
           >
-            <GameroomPlayers gameRoomID={gameRoomID} players={players} />
+            <GameroomPlayers  players={players} />
             <Canvas gameRoomID={gameRoomID} isPainter={isPainter} />
             <Chat
               gameRoomID={gameRoomID}
