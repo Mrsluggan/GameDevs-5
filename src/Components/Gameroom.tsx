@@ -68,7 +68,7 @@ function Gameroom() {
 
   const loadPlayers = () => {
     fetch(
-      "https://urchin-app-dd7xw.ondigitalocean.app/api/gameroom/" +
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" +
         gameRoomID +
         "/players"
     )
