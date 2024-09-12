@@ -67,7 +67,11 @@ function Gameroom() {
   });
 
   const loadPlayers = () => {
-    fetch("http://localhost:8080/api/gameroom/" + gameRoomID + "/players")
+    fetch(
+      "https://urchin-app-dd7xw.ondigitalocean.app/api/gameroom/" +
+        gameRoomID +
+        "/players"
+    )
       .then((res) => res.json())
       .then((data) => {
         setPlayers(data);
