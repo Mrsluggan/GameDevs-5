@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { StompSessionProvider } from "react-stomp-hooks";
 
 import Gameroom from "./Components/Gameroom";
 import Menu from "./Components/Menu";
@@ -8,6 +9,7 @@ import Start from "./Components/Start";
 import Register from "./Components/Register";
 import Login from "./Components/Login";
 import Leaderboard from "./Components/Leaderboard";
+import AddWord from "./Components/AddWord";
 
 function App() {
   const [page, setPage] = useState<string>("");
@@ -41,29 +43,36 @@ function App() {
 
   return (
     <>
-      <h1>Drawing Game</h1>
-      <Menu
-        setPage={setPage}
-        setIsLoggedIn={setIsLoggedIn}
-        isLoggedIn={isLoggedIn}
-      />
+      <StompSessionProvider url="https://monkfish-app-xpltr.ondigitalocean.app/ws-endpoint">
+        <h1>Drawing Game</h1>
+        <Menu
+          setPage={setPage}
+          setIsLoggedIn={setIsLoggedIn}
+          isLoggedIn={isLoggedIn}
+        />
 
-      {{
-        start: <Start />,
-        login: <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />,
-        register: <Register setPage={setPage} />,
-        about: <About />,
-        gameroom: isLoggedIn ? (
-          <Gameroom />
-        ) : (
-          <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
-        ),
-        leaderboard: isLoggedIn ? (
-          <Leaderboard />
-        ) : (
-          <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
-        ),
-      }[page] || <Start />}
+        {{
+          start: <Start />,
+          login: <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />,
+          register: <Register setPage={setPage} />,
+          about: <About />,
+          gameroom: isLoggedIn ? (
+            <Gameroom />
+          ) : (
+            <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+          ),
+          leaderboard: isLoggedIn ? (
+            <Leaderboard />
+          ) : (
+            <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+          ),
+          AddWord: isLoggedIn ? (
+            <AddWord />
+          ) : (
+            <Login setPage={setPage} setIsLoggedIn={setIsLoggedIn} />
+          ),
+        }[page] || <Start />}
+      </StompSessionProvider>
     </>
   );
 }

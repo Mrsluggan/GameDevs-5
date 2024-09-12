@@ -14,9 +14,8 @@ function Menu(props: Props) {
       {props.isLoggedIn && (
         <>
           <button onClick={() => props.setPage("gameroom")}>Spela</button>
-          <button onClick={() => props.setPage("leaderboard")}>
-            Topplista
-          </button>
+          <button onClick={() => props.setPage("leaderboard")}>Topplista</button>
+          <button onClick={() => props.setPage("AddWord")}>Lägg till ord</button>
           <Logout setIsLoggedIn={props.setIsLoggedIn} setPage={props.setPage} />
         </>
       )}
