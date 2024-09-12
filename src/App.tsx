@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { StompSessionProvider, useSubscription } from "react-stomp-hooks";
+import { StompSessionProvider } from "react-stomp-hooks";
 
 import Gameroom from "./Components/Gameroom";
 import Menu from "./Components/Menu";

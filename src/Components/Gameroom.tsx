@@ -6,10 +6,18 @@ import GameroomPlayers from "./GameroomPlayers";
 import LobbyChat from "./LobbyChat";
 import "./GameStyle.css";
 
+interface GameRoom {
+  id: string;
+  gameRoomName: string;
+  roomOwner: string;
+  listOfPlayers: string[];
+  painter: string;
+  randomWord: string;
+}
 
 function Gameroom() {
   const stompClient = useStompClient();
-  const [gamerooms, setGamerooms] = useState<any[]>([]);
+  const [gamerooms, setGamerooms] = useState<GameRoom[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [gameRoomID, setGameRoomID] = useState<string>("");
   const [players, setPlayers] = useState<string[]>([]);
@@ -20,15 +28,12 @@ function Gameroom() {
 
   const [currentWord, setCurrentWord] = useState<string>("");
 
-
-
-
-  useSubscription("/topic/updategame/" + gameRoomID, (message: any) => {
-    let parsed = JSON.parse(message.body);
-    console.log('Received painter from WebSocket:', parsed.painter);    
+  useSubscription("/topic/updategame/" + gameRoomID, (message) => {
+    const parsed = JSON.parse(message.body);
+    console.log("Received painter from WebSocket:", parsed.painter);
     setPlayers(parsed.listOfPlayers);
     console.log(players);
-    
+
     setPainter(parsed.painter);
     setCurrentWord(parsed.randomWord);
   });
@@ -54,8 +59,6 @@ function Gameroom() {
     );
   });
 
-
-
   const loadGameRooms = () => {
     fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
@@ -67,13 +70,13 @@ function Gameroom() {
   const checkPlayers = () => {
     fetch(
       "http://localhost:8080/api/gameroom/checkplayer/" +
-      localStorage.getItem("username")
+        localStorage.getItem("username")
     )
       .then((res) => {
         if (res.ok) {
           return res.json();
         } else {
-          throw new Error("Player not found");
+          throw new Error("Kunde inte hitta spelare");
         }
       })
       .then((data) => {
@@ -88,7 +91,7 @@ function Gameroom() {
   };
 
   const createGame = () => {
-    let gameroomName = prompt("Enter gameroom name");
+    const gameroomName = prompt("Enter gameroom name");
     if (gameroomName == null) {
       return;
     }
@@ -107,7 +110,7 @@ function Gameroom() {
       }),
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(() => {
         loadGameRooms();
       });
   };
@@ -117,21 +120,22 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-    fetch(`http://localhost:8080/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
+    fetch(
+      `http://localhost:8080/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
       {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-      })
-      .then((res) => {
-        if (res.ok) {
-          console.log("Game deleted");
-        } else {
-          console.error("Error deleting game");
-        }
-        loadGameRooms();
-      });
+      }
+    ).then((res) => {
+      if (res.ok) {
+        console.log("Spel raderat");
+      } else {
+        console.error("Fel vid radering av spel");
+      }
+      loadGameRooms();
+    });
   };
 
   const joinGame = (gameRoomID: string) => {
@@ -146,7 +150,6 @@ function Gameroom() {
       body: JSON.stringify({
         username: localStorage.getItem("username"),
       }),
-
     }).then(() => {
       fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
         .then((res) => res.json())
@@ -157,10 +160,8 @@ function Gameroom() {
         });
     });
     if (stompClient) {
-
       stompClient.publish({
         destination: "/app/updategame/" + gameRoomID,
-
       });
     }
   };
@@ -172,7 +173,6 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-
 
     fetch("http://localhost:8080/api/gameroom/leave/" + gameRoomID, {
       method: "PUT",
@@ -191,26 +191,21 @@ function Gameroom() {
   const startGame = () => {
     fetch("http://localhost:8080/api/gameroom/setpainter/" + gameRoomID)
       .then((res) => res.json())
-      .then((data: any) => {
-      });
+      .then(() => {});
 
     if (stompClient) {
-
       stompClient.publish({
         destination: "/app/updategame/" + gameRoomID,
-
       });
     }
-  }
+  };
 
   const wonRound = () => {
-    alert("SKIT DU VANN")
+    alert("SKIT DU VANN");
     startGame();
-  }
-
+  };
 
   useEffect(() => {
-
     if (painter === localStorage.getItem("username")) {
       setIsPainter(true);
     } else {
@@ -218,19 +213,13 @@ function Gameroom() {
     }
   }, [painter]);
 
-
-
-
   useEffect(() => {
     loadGameRooms();
     checkPlayers();
   }, []);
 
-
-
   return (
     <>
-      {/* kollar om personen tillhög en grupp, visar antigen gameroom div eller canvas */}
       {!isJoined ? (
         <div id="GameRoomDiv">
           <div>
@@ -261,10 +250,17 @@ function Gameroom() {
                       <button onClick={() => joinGame(gameroom.id)}>
                         Gå med
                       </button>
-                      {localStorage.getItem("username") === gameroom.roomOwner && (
-                        <button onClick={() => deleteGameRoom(gameroom.id, gameroom.roomOwner)}> Ta bort rum</button>
+                      {localStorage.getItem("username") ===
+                        gameroom.roomOwner && (
+                        <button
+                          onClick={() =>
+                            deleteGameRoom(gameroom.id, gameroom.roomOwner)
+                          }
+                        >
+                          {" "}
+                          Ta bort rum
+                        </button>
                       )}
-
                     </div>
                   </div>
                   <hr />
@@ -277,8 +273,6 @@ function Gameroom() {
           </div>
         </div>
       ) : (
-
-
         <div style={{ padding: "2%" }}>
           <div style={{}}>
             <button onClick={leaveGameRoom}>Lämna spelrum</button>
@@ -289,12 +283,18 @@ function Gameroom() {
             <div>
               <h2>Det är du som är ritaren!</h2>
               <h3>Du ska rita ordet: {currentWord}</h3>
-
             </div>
           ) : (
             <h2>Den som ritar är: {painter}</h2>
           )}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
             <GameroomPlayers gameRoomID={gameRoomID} players={players} />
             <Canvas gameRoomID={gameRoomID} isPainter={isPainter} />
             <Chat
@@ -305,15 +305,12 @@ function Gameroom() {
               isPainter={isPainter}
               setIsPainter={setIsPainter}
               wonRound={wonRound}
-
             />
           </div>
-
         </div>
       )}
     </>
   );
 }
-
 
 export default Gameroom;

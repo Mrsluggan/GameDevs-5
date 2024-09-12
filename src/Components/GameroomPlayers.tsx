@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface Player {
   username: string;
@@ -6,28 +6,24 @@ interface Player {
 }
 
 interface GameroomPlayersProps {
-  gameRoomID: string;
-  players: any[];
+  players: Player[];
 }
 
-function GameroomPlayers({ gameRoomID, players }: GameroomPlayersProps) {
-
-
+function GameroomPlayers({ players }: GameroomPlayersProps) {
   useEffect(() => {
     console.log(players + " nu uppdateras det");
-    players.forEach((element) =>{
+    players.forEach((element) => {
       console.log(element);
-      
-    })
+    });
   }, [players]);
 
   return (
     <div>
-      <h3>Players in this game:</h3>
+      <h3>Spelare i detta rummet:</h3>
       <ol>
         {players.map((player, index) => (
           <li key={index}>
-            {player.username} - {player.currentPoints} points
+            {player.username} - {player.currentPoints} poäng
           </li>
         ))}
       </ol>
