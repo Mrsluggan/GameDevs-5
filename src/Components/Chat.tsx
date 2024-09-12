@@ -49,8 +49,26 @@ export default function Chat({
     }
   };
   const checkGuess = (message: string, currentWord: string) => {
+    const sender = localStorage.getItem("username");
+  
     if (message.toLowerCase() === currentWord.toLowerCase()) {
+      // Call the wonRound function (assuming this does something related to winning)
       wonRound();
+  
+      // Fetch to reward points only to the winner
+      fetch(`http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then(response => response.text()) // Expecting plain text response
+        .then(data => {
+          console.log("Points rewarded:", data);
+        })
+        .catch(error => {
+          console.error("Error rewarding points:", error);
+        });
     }
   };
 

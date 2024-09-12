@@ -173,17 +173,35 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-
+  
+    const username = localStorage.getItem("username");
+  
+    
+    fetch(`http://localhost:8080/reset-points/${username}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(response => response.json()) 
+      .then(data => {
+        console.log("User points reset:", data);
+      })
+      .catch(error => {
+        console.error("Error resetting points:", error);
+      });
+  
+    
     fetch("http://localhost:8080/api/gameroom/leave/" + gameRoomID, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: localStorage.getItem("username"),
+        username: username,
       }),
     });
-
+  
     setIsJoined(false);
     loadGameRooms();
   };
