@@ -62,7 +62,7 @@ export default function Chat({
     if (message.toLowerCase() === currentWord.toLowerCase()) {
       wonRound();
   
-      fetch(`http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`, {
+      fetch(`https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/rewardPoints?username=${sender}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
