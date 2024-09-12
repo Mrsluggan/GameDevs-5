@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 
-interface Player {
-  username: string;
-  currentPoints: number;
-}
-
 interface GameroomPlayersProps {
-  players: Player[];
+  gameRoomID: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  players: any[];
 }
 
 function GameroomPlayers({ players }: GameroomPlayersProps) {

@@ -74,7 +74,9 @@ export default function Chat({
   };
 
   const loadMessags = (gameRoomID: string) => {
-    fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
+    fetch(
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" + gameRoomID
+    )
       .then((res) => res.json())
       .then((data) => {
         data.roomChat.listOfMessages.forEach((message: Message) => {

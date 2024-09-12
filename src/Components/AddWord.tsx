@@ -10,7 +10,7 @@ function AddWord() {
 
     console.log("Lägger till ord: " + word);
 
-    fetch("http://localhost:8080/createWord", {
+    fetch("https://monkfish-app-xpltr.ondigitalocean.app/createWord", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
