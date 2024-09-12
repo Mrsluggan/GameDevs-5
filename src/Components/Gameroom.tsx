@@ -10,7 +10,6 @@ interface gameroom {
   gameRoomName: any;
 }
 
-
 function Gameroom() {
   const stompClient = useStompClient();
   const [gamerooms, setGamerooms] = useState<any[]>([]);
