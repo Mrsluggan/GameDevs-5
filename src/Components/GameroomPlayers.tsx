@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 
 interface Player {
   username: string;
@@ -9,26 +8,19 @@ interface GameroomPlayersProps {
   players: Player[];
 }
 
-function GameroomPlayers({ players }: GameroomPlayersProps) {
-  useEffect(() => {
-    console.log(players + " nu uppdateras det");
-    players.forEach((element) => {
-      console.log(element);
-    });
-  }, [players]);
-
+const GameroomPlayers = ({ players }: GameroomPlayersProps) => {
   return (
     <div>
-      <h3>Spelare i detta rummet:</h3>
-      <ol>
-        {players.map((player, index) => (
-          <li key={index}>
-            {player.username} - {player.currentPoints} poäng
+      <h3>Players in the game room</h3>
+      <ul>
+        {players.map((player) => (
+          <li key={player.username}>
+            <span>{player.username}</span> - <strong>{player.currentPoints} points</strong>
           </li>
         ))}
-      </ol>
+      </ul>
     </div>
   );
-}
+};
 
 export default GameroomPlayers;
