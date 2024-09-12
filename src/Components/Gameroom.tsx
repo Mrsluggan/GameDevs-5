@@ -21,14 +21,14 @@ function Gameroom() {
   const [currentWord, setCurrentWord] = useState<string>("");
 
 
+  const [gameActive, setGameActive] = useState<boolean>(true);
+
 
 
   useSubscription("/topic/updategame/" + gameRoomID, (message: any) => {
     let parsed = JSON.parse(message.body);
-    console.log('Received painter from WebSocket:', parsed.painter);    
     setPlayers(parsed.listOfPlayers);
-    console.log(players);
-    
+    setGameActive(parsed.status);
     setPainter(parsed.painter);
     setCurrentWord(parsed.randomWord);
   });
@@ -80,7 +80,6 @@ function Gameroom() {
         if (localStorage.getItem("username") === data.roomOwner) {
           setRoomOwner(data.roomOwner);
         }
-
         setGameRoomID(data.id);
         setIsJoined(true);
         joinGame(data.id);
@@ -193,7 +192,7 @@ function Gameroom() {
       .then((res) => res.json())
       .then((data: any) => {
       });
-
+      
     if (stompClient) {
 
       stompClient.publish({
@@ -284,16 +283,19 @@ function Gameroom() {
             <button onClick={leaveGameRoom}>Lämna spelrum</button>
             {roomOwner && <button onClick={startGame}>Starta spelet</button>}
           </div>
-
-          {isPainter ? (
+          {gameActive &&
             <div>
-              <h2>Det är du som är ritaren!</h2>
-              <h3>Du ska rita ordet: {currentWord}</h3>
+              {isPainter ? (
+                <div>
+                  <h2>Det är du som är ritaren!</h2>
+                  <h3>Du ska rita ordet: {currentWord}</h3>
 
+                </div>
+              ) : (
+                <h2>Den som ritar är: {painter}</h2>
+              )}
             </div>
-          ) : (
-            <h2>Den som ritar är: {painter}</h2>
-          )}
+          }
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
             <GameroomPlayers gameRoomID={gameRoomID} players={players} />
             <Canvas gameRoomID={gameRoomID} isPainter={isPainter} />
