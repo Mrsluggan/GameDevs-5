@@ -75,7 +75,7 @@ function Gameroom() {
   };
 
   const loadGameRooms = () => {
-    fetch("http://localhost:8080/api/gameroom/")
+    fetch("https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/")
       .then((res) => res.json())
       .then((data) => {
         setGamerooms(data);
@@ -84,7 +84,7 @@ function Gameroom() {
 
   const checkPlayers = () => {
     fetch(
-      "http://localhost:8080/api/gameroom/checkplayer/" +
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/checkplayer/" +
         localStorage.getItem("username")
     )
       .then((res) => {
@@ -114,7 +114,7 @@ function Gameroom() {
       alert("Du måste ange ett namn på rummet");
       return;
     }
-    fetch("http://localhost:8080/api/gameroom/create", {
+    fetch("https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,7 +136,7 @@ function Gameroom() {
       return;
     }
     fetch(
-      `http://localhost:8080/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
+      `https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
       {
         method: "DELETE",
         headers: {
@@ -157,16 +157,23 @@ function Gameroom() {
     setIsJoined(true);
     setGameRoomID(gameRoomID);
 
-    fetch("http://localhost:8080/api/gameroom/join/" + gameRoomID, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: localStorage.getItem("username"),
-      }),
-    }).then(() => {
-      fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
+    fetch(
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/join/" +
+        gameRoomID,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: localStorage.getItem("username"),
+        }),
+      }
+    ).then(() => {
+      fetch(
+        "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" +
+          gameRoomID
+      )
         .then((res) => res.json())
         .then((data) => {
           setPlayers(data.listOfPlayers);
@@ -188,41 +195,49 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-  
+
     const username = localStorage.getItem("username");
-  
-    
-    fetch(`http://localhost:8080/reset-points/${username}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(response => response.json()) 
-      .then(data => {
+
+    fetch(
+      `https://monkfish-app-xpltr.ondigitalocean.app/reset-points/${username}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
         console.log("User points reset:", data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error resetting points:", error);
       });
-  
-    
-    fetch("http://localhost:8080/api/gameroom/leave/" + gameRoomID, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-      }),
-    });
-  
+
+    fetch(
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/leave/" +
+        gameRoomID,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+        }),
+      }
+    );
+
     setIsJoined(false);
     loadGameRooms();
   };
 
   const startGame = () => {
-    fetch("http://localhost:8080/api/gameroom/setpainter/" + gameRoomID)
+    fetch(
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/setpainter/" +
+        gameRoomID
+    )
       .then((res) => res.json())
       .then(() => {});
     

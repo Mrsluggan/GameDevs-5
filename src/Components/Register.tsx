@@ -21,7 +21,7 @@ function RegisterPage({ setPage }: Props) {
   const registerUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch("http://localhost:8080/register-user", {
+    fetch("https://monkfish-app-xpltr.ondigitalocean.app/register-user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
