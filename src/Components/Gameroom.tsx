@@ -240,8 +240,6 @@ function Gameroom() {
     )
       .then((res) => res.json())
       .then(() => {});
-    
-      
 
     if (stompClient) {
       stompClient.publish({
@@ -337,7 +335,7 @@ function Gameroom() {
           ) : (
             <h2>Den som ritar är: {painter}</h2>
           )}
-          
+
           <div
             style={{
               display: "flex",
@@ -346,7 +344,7 @@ function Gameroom() {
               gap: "10px",
             }}
           >
-            <GameroomPlayers  players={players} />
+            <GameroomPlayers players={players} />
             <Canvas gameRoomID={gameRoomID} isPainter={isPainter} />
             <Chat
               gameRoomID={gameRoomID}
