@@ -50,23 +50,24 @@ export default function Chat({
   };
   const checkGuess = (message: string, currentWord: string) => {
     const sender = localStorage.getItem("username");
-  
+
     if (message.toLowerCase() === currentWord.toLowerCase()) {
-      
       wonRound();
-  
-      
-      fetch(`http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then(response => response.text()) 
-        .then(data => {
+
+      fetch(
+        `https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/rewardPoints?username=${sender}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((response) => response.text())
+        .then((data) => {
           console.log("Points rewarded:", data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error rewarding points:", error);
         });
     }
@@ -92,7 +93,9 @@ export default function Chat({
   };
 
   const loadMessags = (gameRoomID: string) => {
-    fetch("http://localhost:8080/api/gameroom/" + gameRoomID)
+    fetch(
+      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" + gameRoomID
+    )
       .then((res) => res.json())
       .then((data) => {
         data.roomChat.listOfMessages.forEach((message: Message) => {
