@@ -1,8 +1,10 @@
+interface Player {
+  username: string;
+  currentPoints: number;
+}
 
 interface GameroomPlayersProps {
-  gameRoomID: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  players: any[];
+  players: Player[];
 }
 
 const GameroomPlayers = ({ players }: GameroomPlayersProps) => {
@@ -12,7 +14,8 @@ const GameroomPlayers = ({ players }: GameroomPlayersProps) => {
       <ul>
         {players.map((player) => (
           <li key={player.username}>
-            <span>{player.username}</span> - <strong>{player.currentPoints} points</strong>
+            <span>{player.username}</span> -{" "}
+            <strong>{player.currentPoints} points</strong>
           </li>
         ))}
       </ul>
