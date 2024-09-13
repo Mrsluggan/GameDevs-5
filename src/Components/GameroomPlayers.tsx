@@ -7,20 +7,19 @@ interface GameroomPlayersProps {
   players: Player[];
 }
 
-const GameroomPlayers = ({ players }: GameroomPlayersProps) => {
+function GameroomPlayers({ players }: GameroomPlayersProps) {
   return (
     <div>
-      <h3>Players in the game room</h3>
-      <ul>
+      <h3>Spelare i detta rummet:</h3>
+      <ol>
         {players.map((player) => (
           <li key={player.username}>
-            <span>{player.username}</span> -{" "}
-            <strong>{player.currentPoints} points</strong>
+            {player.username} - {player.currentPoints} poäng
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   );
-};
+}
 
 export default GameroomPlayers;
