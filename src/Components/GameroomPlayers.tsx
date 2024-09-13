@@ -8,10 +8,6 @@ interface GameroomPlayersProps {
 }
 
 function GameroomPlayers({ players }: GameroomPlayersProps) {
-  useEffect(() => {
-    console.log("Players updated:", players);
-  }, [players]);
-
   return (
     <div>
       <h3>Spelare i detta rummet:</h3>
@@ -21,9 +17,9 @@ function GameroomPlayers({ players }: GameroomPlayersProps) {
             {player.username} - {player.currentPoints} poäng
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   );
-};
+}
 
 export default GameroomPlayers;
