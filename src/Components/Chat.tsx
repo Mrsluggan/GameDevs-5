@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useStompClient, useSubscription } from "react-stomp-hooks";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+console.log("API URL:", API_URL);
+
 interface Message {
   content: string;
   sender: string;
@@ -23,11 +27,11 @@ interface Props {
 
 export default function Chat({
   gameRoomID,
-  
+
   randomWord,
-  
+
   isPainter,
-  
+
   wonRound,
 }: Props) {
   const stompClient = useStompClient();
@@ -83,18 +87,20 @@ export default function Chat({
 
     if (message.toLowerCase() === currentWord.toLowerCase()) {
       wonRound();
-      fetch(
-        `http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
+
+      fetch(`${API_URL}/api/gameroom/rewardPoints?username=${sender}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
         .then((response) => response.text())
-        .then((data) => {
-          console.log("Points rewarded:", data);
+        .then(() => {
+          if (stompClient) {
+            stompClient.publish({
+              destination: `/app/updategame/${gameRoomID}`,
+            });
+          }
 
         })
         .catch((error) => {
@@ -133,9 +139,8 @@ export default function Chat({
   };
 
   const loadMessags = (gameRoomID: string) => {
-    fetch(
-      "http://localhost:8080/api/gameroom/" + gameRoomID
-    )
+    fetch(`${API_URL}/api/gameroom/` + gameRoomID)
+
       .then((res) => res.json())
       .then((data) => {
         data.roomChat.listOfMessages.forEach((message: Message) => {

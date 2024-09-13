@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface User {
   userId: string;
   username: string;
@@ -15,9 +17,8 @@ function Leaderboard() {
 
   const fetchTopUsers = async () => {
     try {
-      const res = await fetch(
-        "http://localhost:8080/get-top-users"
-      );
+      const res = await fetch(`${API_URL}/get-top-users`);
+
       const data = await res.json();
       setUsers(data);
     } catch (error) {

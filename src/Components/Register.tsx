@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface user {
   username: string;
   password: string;
@@ -21,7 +23,8 @@ function RegisterPage({ setPage }: Props) {
   const registerUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch("http://localhost:8080/register-user", {
+    fetch(`${API_URL}/register-user`, {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -6,6 +6,8 @@ import GameroomPlayers from "./GameroomPlayers";
 import LobbyChat from "./LobbyChat";
 import "./GameStyle.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface Player {
   username: string;
   currentPoints: number;
@@ -72,11 +74,8 @@ function Gameroom() {
   });
 
   const loadPlayers = () => {
-    fetch(
-      "http://localhost:8080/api/gameroom/" +
-        gameRoomID +
-        "/players"
-    )
+    fetch(`${API_URL}/api/gameroom/` + gameRoomID + "/players")
+
       .then((res) => res.json())
       .then((data) => {
         setPlayers(data);
@@ -84,7 +83,8 @@ function Gameroom() {
   };
 
   const loadGameRooms = () => {
-    fetch("http://localhost:8080/api/gameroom/")
+    fetch(`${API_URL}/api/gameroom/`)
+
       .then((res) => res.json())
       .then((data) => {
         setGamerooms(data);
@@ -93,8 +93,8 @@ function Gameroom() {
 
   const checkPlayers = () => {
     fetch(
-      "http://localhost:8080/api/gameroom/checkplayer/" +
-        localStorage.getItem("username")
+      `${API_URL}/api/gameroom/checkplayer/` + localStorage.getItem("username")
+
     )
       .then((res) => {
         if (res.ok) {
@@ -123,7 +123,8 @@ function Gameroom() {
       alert("Du måste ange ett namn på rummet");
       return;
     }
-    fetch("http://localhost:8080/api/gameroom/create", {
+    fetch(`${API_URL}/api/gameroom/create`, {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -144,15 +145,13 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-    fetch(
-      `http://localhost:8080/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    ).then((res) => {
+    fetch(`${API_URL}/api/gameroom/delete/${gameRoomID}/${roomOwner}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+
       if (res.ok) {
         console.log("Spel raderat");
       } else {
@@ -166,23 +165,17 @@ function Gameroom() {
     setIsJoined(true);
     setGameRoomID(gameRoomID);
 
-    fetch(
-      "http://localhost:8080/api/gameroom/join/" +
-        gameRoomID,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: localStorage.getItem("username"),
-        }),
-      }
-    ).then(() => {
-      fetch(
-        "http://localhost:8080/api/gameroom/" +
-          gameRoomID
-      )
+    fetch(`${API_URL}/api/gameroom/join/` + gameRoomID, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: localStorage.getItem("username"),
+      }),
+    }).then(() => {
+      fetch(`${API_URL}/api/gameroom/` + gameRoomID)
+
         .then((res) => res.json())
         .then((data) => {
           setPlayers(data.listOfPlayers);
@@ -205,15 +198,14 @@ function Gameroom() {
       return;
     }
     const username = localStorage.getItem("username");
-    fetch(
-      `http://localhost:8080/reset-points/${username}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+
+    fetch(`${API_URL}/reset-points/${username}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
       .then((response) => response.json())
       .then((data) => {
         console.log("User points reset:", data);
@@ -222,34 +214,30 @@ function Gameroom() {
         console.error("Error resetting points:", error);
       });
 
-    fetch(
-      "http://localhost:8080/api/gameroom/leave/" +
-        gameRoomID,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-        }),
-      }
-    );
+    fetch(`${API_URL}/api/gameroom/leave/` + gameRoomID, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+      }),
+    });
+
 if (stompClient) {
   stompClient.publish({
     destination: "/app/updategame/" + gameRoomID,
   });
 }
+
     setIsJoined(false);
     loadGameRooms();
 
   };
 
   const startGame = () => {
-    fetch(
-      "http://localhost:8080/api/gameroom/setpainter/" +
-        gameRoomID
-    )
+    fetch(`${API_URL}/api/gameroom/setpainter/` + gameRoomID)
+
       .then((res) => res.json())
       .then(() => {});
 
