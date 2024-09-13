@@ -14,9 +14,10 @@ interface GameRoom {
   id: string;
   gameRoomName: string;
   roomOwner: string;
-  listOfPlayers: string[];
+  listOfPlayers: Player[];
   painter: string;
   randomWord: string;
+  players: Player[];
 }
 
 function Gameroom() {
@@ -24,15 +25,16 @@ function Gameroom() {
   const [gamerooms, setGamerooms] = useState<GameRoom[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [gameRoomID, setGameRoomID] = useState<string>("");
-  const [players, setPlayers] = useState<string[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [roomOwner, setRoomOwner] = useState<boolean>(false);
   const [painter, setPainter] = useState<string>("");
   const [isPainter, setIsPainter] = useState<boolean>(false);
   const [currentWord, setCurrentWord] = useState<string>("");
 
-  useSubscription("/topic/updategame/" + gameRoomID, (message) => {
+  useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
     const parsed = JSON.parse(message.body);
     console.log("Received painter from WebSocket:", parsed.painter);
+    loadPlayers();
     setPlayers(parsed.listOfPlayers);
     console.log(players);
     setPainter(parsed.painter);
@@ -345,6 +347,7 @@ if (stompClient) {
           ) : (
             <h2>Den som ritar är: {painter}</h2>
           )}
+
           <div
             style={{
               display: "flex",
@@ -353,7 +356,7 @@ if (stompClient) {
               gap: "10px",
             }}
           >
-            <GameroomPlayers gameRoomID={gameRoomID} players={players} />
+            <GameroomPlayers players={players} />
             <Canvas gameRoomID={gameRoomID} isPainter={isPainter} />
             <Chat
               gameRoomID={gameRoomID}

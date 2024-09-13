@@ -6,9 +6,14 @@ interface Message {
   sender: string;
 }
 
+interface Player {
+  username: string;
+  currentPoints: number;
+}
+
 interface Props {
   gameRoomID: string;
-  players: string[];
+  players: Player[];
   randomWord: string;
   painter: string;
   isPainter: boolean;
@@ -18,8 +23,11 @@ interface Props {
 
 export default function Chat({
   gameRoomID,
+  
   randomWord,
+  
   isPainter,
+  
   wonRound,
 }: Props) {
   const stompClient = useStompClient();
@@ -75,7 +83,6 @@ export default function Chat({
 
     if (message.toLowerCase() === currentWord.toLowerCase()) {
       wonRound();
-
       fetch(
         `http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`,
         {
@@ -88,6 +95,7 @@ export default function Chat({
         .then((response) => response.text())
         .then((data) => {
           console.log("Points rewarded:", data);
+
         })
         .catch((error) => {
           console.error("Error rewarding points:", error);
