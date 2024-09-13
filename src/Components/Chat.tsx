@@ -20,6 +20,7 @@ interface Props {
   setIsPainter: (isPainter: boolean) => void;
   wonRound: () => void;
 }
+
 export default function Chat({
   gameRoomID,
   
@@ -56,30 +57,59 @@ export default function Chat({
       });
     }
   };
+
+  const announceWinner = (winner: string) => {
+    if (stompClient) {
+      stompClient.publish({
+        destination: "/app/message/" + gameRoomID,
+        body: JSON.stringify({
+          content: `${winner} gissade rätt!`,
+          sender: "System",
+        }),
+      });
+      stompClient.publish({
+        destination: "/app/clearcanvas/" + gameRoomID,
+      });
+      if (stompClient) {
+        stompClient.publish({
+          destination: "/app/updategame/" + gameRoomID,
+        });
+      }
+    }
+  };
+
   const checkGuess = (message: string, currentWord: string) => {
     const sender = localStorage.getItem("username");
 
     if (message.toLowerCase() === currentWord.toLowerCase()) {
       wonRound();
-  
-      fetch(`https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/rewardPoints?username=${sender}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then(response => response.text())
-        .then(() => {
-          // Publish update to WebSocket after awarding points
-          if (stompClient) {
-            stompClient.publish({
-              destination: `/app/updategame/${gameRoomID}`,
-            });
-          }
+      fetch(
+        `http://localhost:8080/api/gameroom/rewardPoints?username=${sender}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((response) => response.text())
+        .then((data) => {
+          console.log("Points rewarded:", data);
+
         })
         .catch((error) => {
           console.error("Error rewarding points:", error);
         });
+        if (stompClient) {
+          stompClient.publish({
+            destination: "/app/updategame/" + gameRoomID,
+          });
+        }
+      if (sender) {
+        announceWinner(sender);
+      } else {
+        console.error("Sender is null");
+      }
     }
   };
 
@@ -104,7 +134,7 @@ export default function Chat({
 
   const loadMessags = (gameRoomID: string) => {
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" + gameRoomID
+      "http://localhost:8080/api/gameroom/" + gameRoomID
     )
       .then((res) => res.json())
       .then((data) => {
@@ -178,14 +208,11 @@ export default function Chat({
                 marginBottom: "10px",
                 backgroundColor: "white",
                 color: "black",
-
                 resize: "none",
                 height: "50px",
               }}
               rows={3}
             />
-
-            {/* Vi måste hitta ett bättre sätt att göra dettta? liksom va fan är de här för knapp lol*/}
 
             <button
               onClick={() => {

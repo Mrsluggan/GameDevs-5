@@ -43,7 +43,7 @@ function App() {
 
   return (
     <>
-      <StompSessionProvider url="https://monkfish-app-xpltr.ondigitalocean.app/ws-endpoint">
+      <StompSessionProvider url="http://localhost:8080/ws-endpoint">
         <h1>Drawing Game</h1>
         <Menu
           setPage={setPage}

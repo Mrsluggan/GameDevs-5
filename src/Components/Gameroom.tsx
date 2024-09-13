@@ -27,10 +27,8 @@ function Gameroom() {
   const [gameRoomID, setGameRoomID] = useState<string>("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [roomOwner, setRoomOwner] = useState<boolean>(false);
-
   const [painter, setPainter] = useState<string>("");
   const [isPainter, setIsPainter] = useState<boolean>(false);
-
   const [currentWord, setCurrentWord] = useState<string>("");
 
   useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
@@ -39,7 +37,6 @@ function Gameroom() {
     loadPlayers();
     setPlayers(parsed.listOfPlayers);
     console.log(players);
-
     setPainter(parsed.painter);
     setCurrentWord(parsed.randomWord);
   });
@@ -59,6 +56,14 @@ function Gameroom() {
     );
   });
 
+  useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
+    const parsed = JSON.parse(message.body);
+    console.log("Received update from WebSocket:", parsed);
+    setPlayers(parsed.listOfPlayers);
+    setPainter(parsed.painter);
+    setCurrentWord(parsed.randomWord);
+  });
+
   useSubscription("/topic/gamerooms/delete", (message) => {
     const deletedGameRoomID = message.body;
     setGamerooms((prevGamerooms) =>
@@ -68,7 +73,7 @@ function Gameroom() {
 
   const loadPlayers = () => {
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" +
+      "http://localhost:8080/api/gameroom/" +
         gameRoomID +
         "/players"
     )
@@ -79,7 +84,7 @@ function Gameroom() {
   };
 
   const loadGameRooms = () => {
-    fetch("https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/")
+    fetch("http://localhost:8080/api/gameroom/")
       .then((res) => res.json())
       .then((data) => {
         setGamerooms(data);
@@ -88,7 +93,7 @@ function Gameroom() {
 
   const checkPlayers = () => {
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/checkplayer/" +
+      "http://localhost:8080/api/gameroom/checkplayer/" +
         localStorage.getItem("username")
     )
       .then((res) => {
@@ -118,7 +123,7 @@ function Gameroom() {
       alert("Du måste ange ett namn på rummet");
       return;
     }
-    fetch("https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/create", {
+    fetch("http://localhost:8080/api/gameroom/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -140,7 +145,7 @@ function Gameroom() {
       return;
     }
     fetch(
-      `https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
+      `http://localhost:8080/api/gameroom/delete/${gameRoomID}/${roomOwner}`,
       {
         method: "DELETE",
         headers: {
@@ -162,7 +167,7 @@ function Gameroom() {
     setGameRoomID(gameRoomID);
 
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/join/" +
+      "http://localhost:8080/api/gameroom/join/" +
         gameRoomID,
       {
         method: "PUT",
@@ -175,7 +180,7 @@ function Gameroom() {
       }
     ).then(() => {
       fetch(
-        "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/" +
+        "http://localhost:8080/api/gameroom/" +
           gameRoomID
       )
         .then((res) => res.json())
@@ -199,11 +204,9 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-
     const username = localStorage.getItem("username");
-
     fetch(
-      `https://monkfish-app-xpltr.ondigitalocean.app/reset-points/${username}`,
+      `http://localhost:8080/reset-points/${username}`,
       {
         method: "POST",
         headers: {
@@ -220,7 +223,7 @@ function Gameroom() {
       });
 
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/leave/" +
+      "http://localhost:8080/api/gameroom/leave/" +
         gameRoomID,
       {
         method: "PUT",
@@ -232,14 +235,19 @@ function Gameroom() {
         }),
       }
     );
-
+if (stompClient) {
+  stompClient.publish({
+    destination: "/app/updategame/" + gameRoomID,
+  });
+}
     setIsJoined(false);
     loadGameRooms();
+
   };
 
   const startGame = () => {
     fetch(
-      "https://monkfish-app-xpltr.ondigitalocean.app/api/gameroom/setpainter/" +
+      "http://localhost:8080/api/gameroom/setpainter/" +
         gameRoomID
     )
       .then((res) => res.json())
