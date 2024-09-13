@@ -45,7 +45,9 @@ function App() {
 
   return (
     <>
+
       <StompSessionProvider url={`${API_URL}/ws-endpoint`}>
+
         <h1>Drawing Game</h1>
         <Menu
           setPage={setPage}

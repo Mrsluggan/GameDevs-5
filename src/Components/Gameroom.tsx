@@ -29,10 +29,8 @@ function Gameroom() {
   const [gameRoomID, setGameRoomID] = useState<string>("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [roomOwner, setRoomOwner] = useState<boolean>(false);
-
   const [painter, setPainter] = useState<string>("");
   const [isPainter, setIsPainter] = useState<boolean>(false);
-
   const [currentWord, setCurrentWord] = useState<string>("");
 
   useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
@@ -41,7 +39,6 @@ function Gameroom() {
     loadPlayers();
     setPlayers(parsed.listOfPlayers);
     console.log(players);
-
     setPainter(parsed.painter);
     setCurrentWord(parsed.randomWord);
   });
@@ -61,6 +58,14 @@ function Gameroom() {
     );
   });
 
+  useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
+    const parsed = JSON.parse(message.body);
+    console.log("Received update from WebSocket:", parsed);
+    setPlayers(parsed.listOfPlayers);
+    setPainter(parsed.painter);
+    setCurrentWord(parsed.randomWord);
+  });
+
   useSubscription("/topic/gamerooms/delete", (message) => {
     const deletedGameRoomID = message.body;
     setGamerooms((prevGamerooms) =>
@@ -70,6 +75,7 @@ function Gameroom() {
 
   const loadPlayers = () => {
     fetch(`${API_URL}/api/gameroom/` + gameRoomID + "/players")
+
       .then((res) => res.json())
       .then((data) => {
         setPlayers(data);
@@ -78,6 +84,7 @@ function Gameroom() {
 
   const loadGameRooms = () => {
     fetch(`${API_URL}/api/gameroom/`)
+
       .then((res) => res.json())
       .then((data) => {
         setGamerooms(data);
@@ -87,6 +94,7 @@ function Gameroom() {
   const checkPlayers = () => {
     fetch(
       `${API_URL}/api/gameroom/checkplayer/` + localStorage.getItem("username")
+
     )
       .then((res) => {
         if (res.ok) {
@@ -116,6 +124,7 @@ function Gameroom() {
       return;
     }
     fetch(`${API_URL}/api/gameroom/create`, {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -142,6 +151,7 @@ function Gameroom() {
         "Content-Type": "application/json",
       },
     }).then((res) => {
+
       if (res.ok) {
         console.log("Spel raderat");
       } else {
@@ -165,6 +175,7 @@ function Gameroom() {
       }),
     }).then(() => {
       fetch(`${API_URL}/api/gameroom/` + gameRoomID)
+
         .then((res) => res.json())
         .then((data) => {
           setPlayers(data.listOfPlayers);
@@ -186,7 +197,6 @@ function Gameroom() {
     if (!confirmed) {
       return;
     }
-
     const username = localStorage.getItem("username");
 
     fetch(`${API_URL}/reset-points/${username}`, {
@@ -195,6 +205,7 @@ function Gameroom() {
         "Content-Type": "application/json",
       },
     })
+
       .then((response) => response.json())
       .then((data) => {
         console.log("User points reset:", data);
@@ -213,12 +224,20 @@ function Gameroom() {
       }),
     });
 
+if (stompClient) {
+  stompClient.publish({
+    destination: "/app/updategame/" + gameRoomID,
+  });
+}
+
     setIsJoined(false);
     loadGameRooms();
+
   };
 
   const startGame = () => {
     fetch(`${API_URL}/api/gameroom/setpainter/` + gameRoomID)
+
       .then((res) => res.json())
       .then(() => {});
 

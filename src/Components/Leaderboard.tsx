@@ -18,6 +18,7 @@ function Leaderboard() {
   const fetchTopUsers = async () => {
     try {
       const res = await fetch(`${API_URL}/get-top-users`);
+
       const data = await res.json();
       setUsers(data);
     } catch (error) {

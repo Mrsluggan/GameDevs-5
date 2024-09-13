@@ -24,6 +24,7 @@ function RegisterPage({ setPage }: Props) {
     e.preventDefault();
 
     fetch(`${API_URL}/register-user`, {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",

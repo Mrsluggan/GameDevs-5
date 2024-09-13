@@ -24,6 +24,7 @@ function Login({ setPage, setIsLoggedIn }: Props) {
     e.preventDefault();
 
     fetch(`${API_URL}/login-user`, {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -13,6 +13,7 @@ function AddWord() {
     console.log("Lägger till ord: " + word);
 
     fetch(`${API_URL}/createWord`, {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,6 +30,7 @@ function AddWord() {
       })
       .then((data) => {
         console.log("Ordet lades till: ", data);
+        setErrorMessage("Ordet lades till!");
         if (errorMessage) {
           setErrorMessage("Ordet lades till!");
         }
