@@ -11,6 +11,8 @@ import Login from "./Components/Login";
 import Leaderboard from "./Components/Leaderboard";
 import AddWord from "./Components/AddWord";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const [page, setPage] = useState<string>("");
 
@@ -43,7 +45,7 @@ function App() {
 
   return (
     <>
-      <StompSessionProvider url="https://monkfish-app-xpltr.ondigitalocean.app/ws-endpoint">
+      <StompSessionProvider url={`${API_URL}/ws-endpoint`}>
         <h1>Drawing Game</h1>
         <Menu
           setPage={setPage}

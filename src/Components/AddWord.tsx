@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AddWord() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const addWord = (e: React.FormEvent) => {
@@ -10,7 +12,7 @@ function AddWord() {
 
     console.log("Lägger till ord: " + word);
 
-    fetch("https://monkfish-app-xpltr.ondigitalocean.app/createWord", {
+    fetch(`${API_URL}/createWord`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
