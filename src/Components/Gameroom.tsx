@@ -230,7 +230,7 @@ function Gameroom() {
   };
 
   const wonRound = () => {
-    alert("SKIT DU VANN");
+    alert("DU vann! ");
     startGame();
   };
 
