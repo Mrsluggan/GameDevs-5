@@ -256,7 +256,9 @@ function Gameroom() {
     loadGameRooms();
     checkPlayers();
   }, []);
-
+  useEffect(() => {
+    checkPlayers();
+  }, [gameRoomID]);
   return (
     <>
       {!isJoined ? (
