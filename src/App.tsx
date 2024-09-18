@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import backgroundMusic from "./backgroundMusic.mp3";
 import "./App.css";
 import { StompSessionProvider } from "react-stomp-hooks";
-
 import Gameroom from "./Components/Gameroom";
 import Menu from "./Components/Menu";
 import About from "./Components/About";
@@ -10,6 +10,7 @@ import Register from "./Components/Register";
 import Login from "./Components/Login";
 import Leaderboard from "./Components/Leaderboard";
 import AddWord from "./Components/AddWord";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -43,12 +44,30 @@ function App() {
     window.history.pushState(null, "", "?page=" + pageUrl);
   }, [page]);
 
+  useEffect(() => {
+    const BackgroundAudio = new Audio(backgroundMusic);
+    BackgroundAudio.loop = true;
+
+
+    const playButton = document.getElementById("playButton");
+    if (playButton) {
+      playButton.addEventListener("click", () => {
+        BackgroundAudio.play().catch((error) => {
+          console.error("Error playing audio: ", error);
+        });
+      });
+    }
+  }, []);
+
   return (
     <>
 
+ 
       <StompSessionProvider url={`${API_URL}/ws-endpoint`}>
 
+
         <h1>Drawing Game</h1>
+        <button id="playButton">Bakgrunds musik!</button>
         <Menu
           setPage={setPage}
           setIsLoggedIn={setIsLoggedIn}

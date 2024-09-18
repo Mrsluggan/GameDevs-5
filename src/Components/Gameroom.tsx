@@ -58,13 +58,6 @@ function Gameroom() {
     );
   });
 
-  useSubscription(`/topic/updategame/${gameRoomID}`, (message) => {
-    const parsed = JSON.parse(message.body);
-    console.log("Received update from WebSocket:", parsed);
-    setPlayers(parsed.listOfPlayers);
-    setPainter(parsed.painter);
-    setCurrentWord(parsed.randomWord);
-  });
 
   useSubscription("/topic/gamerooms/delete", (message) => {
     const deletedGameRoomID = message.body;
@@ -73,7 +66,7 @@ function Gameroom() {
     );
   });
 
-  const loadPlayers = () => {
+  const loadPlayers = async () => {
     fetch(`${API_URL}/api/gameroom/` + gameRoomID + "/players")
       .then((res) => res.json())
       .then((data) => {
@@ -81,7 +74,7 @@ function Gameroom() {
       });
   };
 
-  const loadGameRooms = () => {
+  const loadGameRooms = async () => {
     fetch(`${API_URL}/api/gameroom/`)
       .then((res) => res.json())
       .then((data) => {
@@ -89,7 +82,7 @@ function Gameroom() {
       });
   };
 
-  const checkPlayers = () => {
+  const checkPlayers = async () => {
     fetch(
       `${API_URL}/api/gameroom/checkplayer/` + localStorage.getItem("username")
     )
@@ -111,7 +104,7 @@ function Gameroom() {
       });
   };
 
-  const createGame = () => {
+  const createGame = async () => {
     const gameroomName = prompt("Enter gameroom name");
     if (gameroomName == null) {
       return;
@@ -136,7 +129,7 @@ function Gameroom() {
       });
   };
 
-  const deleteGameRoom = (gameRoomID: string, roomOwner: string) => {
+  const deleteGameRoom = async (gameRoomID: string, roomOwner: string) => {
     const confirmed = window.confirm("Vill du verkligen radera ditt rum?");
     if (!confirmed) {
       return;
@@ -156,7 +149,7 @@ function Gameroom() {
     });
   };
 
-  const joinGame = (gameRoomID: string) => {
+  const joinGame = async (gameRoomID: string) => {
     setIsJoined(true);
     setGameRoomID(gameRoomID);
 
@@ -184,7 +177,7 @@ function Gameroom() {
     }
   };
 
-  const leaveGameRoom = () => {
+  const leaveGameRoom = async () => {
     const confirmed = window.confirm(
       "Om du lämnar nollställs din poäng, vill du lämna ändå?"
     );
@@ -227,11 +220,8 @@ function Gameroom() {
     loadGameRooms();
   };
 
-  const startGame = () => {
-    fetch(`${API_URL}/api/gameroom/setpainter/` + gameRoomID)
-      .then((res) => res.json())
-      .then(() => {});
-
+  const startGame = async () => {
+    await fetch(`${API_URL}/api/gameroom/setpainter/` + gameRoomID);
     if (stompClient) {
       stompClient.publish({
         destination: "/app/updategame/" + gameRoomID,
@@ -240,7 +230,7 @@ function Gameroom() {
   };
 
   const wonRound = () => {
-    alert("SKIT DU VANN");
+    alert("DU vann! ");
     startGame();
   };
 
@@ -252,10 +242,17 @@ function Gameroom() {
     }
   }, [painter]);
 
+
+
   useEffect(() => {
     loadGameRooms();
     checkPlayers();
   }, []);
+  useEffect(() => {
+    checkPlayers();
+  }, [gameRoomID]);
+
+
 
   return (
     <>
@@ -291,15 +288,15 @@ function Gameroom() {
                       </button>
                       {localStorage.getItem("username") ===
                         gameroom.roomOwner && (
-                        <button
-                          onClick={() =>
-                            deleteGameRoom(gameroom.id, gameroom.roomOwner)
-                          }
-                        >
-                          {" "}
-                          Ta bort rum
-                        </button>
-                      )}
+                          <button
+                            onClick={() =>
+                              deleteGameRoom(gameroom.id, gameroom.roomOwner)
+                            }
+                          >
+                            {" "}
+                            Ta bort rum
+                          </button>
+                        )}
                     </div>
                   </div>
                   <hr />
